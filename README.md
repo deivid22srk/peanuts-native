@@ -108,6 +108,13 @@ Hold a game's cover to open its own page: picture and speed settings, mods, the 
 After an app update, rebuilding every game is strongly recommended: hold the cover, open **Storage**, tap
 **Build again**, then **Rebuild**.
 
+A built game travels: after a reinstall or on another phone, a game need not be built again. Hold the game's cover,
+open **⋯ Manage › Export pack…** and keep the `banana-pack-<title ID>-<version>.zip` it writes — it is the compiled
+part of the game (the rewritten code and the shaders); the game's own files stay where they are. On the new install,
+add the game with that zip beside its files and **Add game imports it**: the game is ready to play, with no build.
+With the zip anywhere else, **⋯ Manage › Import pack…** takes it (or a pack folder made by the
+[PC builder](peanuts/docs/BUILDER.md)). A pack of an older app version plays while the app updates its shaders.
+
 ## Settings worth knowing
 
 - **Console mode**: Docked or Handheld, for all games in Settings and per game on its page. It can also be changed

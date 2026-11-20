@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
@@ -78,6 +79,39 @@ final class PackZip {
         String base = name.endsWith(".zip") ? name.substring(0, name.length() - 4) : name;
         for (int k = 2; f.exists() || new File(f.getPath() + PARTIAL).exists(); k++) f = new File(dir, base + "-" + k + ".zip");
         return f;
+    }
+
+    /**
+     * The pack .zip of Export pack… beside the game being added: any banana-pack-&lt;title ID&gt;-*.zip in the game's folder (a dump folder) or the .nup's folder, in
+     * their ancestors up to PackFind.LEVELS (never above the volume's root, PackFind.volumeRoot), or in those folders' &lt;dir&gt;/&lt;id&gt;-work/&lt;any&gt;/ — the same walk
+     * Add game searches for a pack folder (PackFind.candidates), so putting the zip beside the game is enough. The newest zip of the nearest folder wins (Export
+     * pack… names them again as -2, -3 instead of replacing); null when there is none. The zip's title is checked again when it is staged (PackZip.stage).
+     */
+    static File exportZip(File game, String id) {
+        String want = ("banana-pack-" + id + "-").toLowerCase(Locale.ROOT);
+        File dir = game.isDirectory() ? game : game.getParentFile();
+        File top = PackFind.volumeRoot(game);
+        for (int level = 0; dir != null && level <= PackFind.LEVELS; level++) {
+            File best = newestZip(dir, want);
+            File work = new File(dir, id + "-work");
+            File[] subs = work.listFiles(f -> f.isDirectory() && !f.getName().startsWith("."));
+            if (subs != null) {
+                Arrays.sort(subs);
+                for (File s : subs) { File f = newestZip(s, want); if (f != null && (best == null || f.lastModified() > best.lastModified())) best = f; }
+            }
+            if (best != null) return best;
+            if (top != null && dir.equals(top)) break;
+            dir = dir.getParentFile();
+        }
+        return null;
+    }
+
+    /** The newest banana-pack-&lt;id&gt;-*.zip directly in a folder, null when there is none (a name that starts with "." is skipped) */
+    private static File newestZip(File dir, String want) {
+        File[] l = dir.listFiles(f -> f.isFile() && !f.getName().startsWith(".") && f.getName().toLowerCase(Locale.ROOT).startsWith(want) && f.getName().toLowerCase(Locale.ROOT).endsWith(".zip"));
+        if (l == null || l.length == 0) return null;
+        Arrays.sort(l, (a, b) -> Long.compare(b.lastModified(), a.lastModified()));
+        return l[0];
     }
 
     /** Exports the pack folder as a stored zip into outDir (see the class comment); returns the zip */

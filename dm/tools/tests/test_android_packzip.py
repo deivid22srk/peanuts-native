@@ -1,7 +1,7 @@
 """The Android launcher's Export pack… / Import pack… (PackZip.java) on the JVM: javac compiles it with Pack, Nup, Profile, ShaderLibs, SaveStore, a stub BuildConfig
 and android/app/src/jvmtest's PackZipJvmTest: an export and import round trip (a stored zip, read back; the imported pack equal to the exported one file by file),
 zip slip refused with nothing written, a pack of a title without a profile (or of another game than the sheet's) refused, unfinished code or no library refused,
-and the swap that keeps the current pack until the new one has its name. Skipped without a JDK."""
+and the swap that keeps the current pack until the new one has its name, and the pack .zip of Export pack… found beside the game (PackZip.exportZip: the game's folder, beside a .nup, a <id>-work folder, the ancestor bound; another title's name, a .partial and a past-bound level not). Skipped without a JDK."""
 import shutil
 import subprocess
 import tempfile
@@ -26,7 +26,7 @@ class PackZipJvm(unittest.TestCase):
             d = Path(d)
             (d / 'stub').mkdir()
             (d / 'stub/BuildConfig.java').write_text(STUB)
-            srcs = [SRC / f'{n}.java' for n in ('PackZip', 'Pack', 'DumpLayout', 'BuildCheck', 'RomfsCheck', 'Nup', 'Nsp', 'Zstd', 'Profile', 'ShaderLibs', 'SaveStore')]
+            srcs = [SRC / f'{n}.java' for n in ('PackZip', 'Pack', 'PackFind', 'DumpLayout', 'BuildCheck', 'RomfsCheck', 'Nup', 'Nsp', 'Zstd', 'Profile', 'ShaderLibs', 'SaveStore')]
             r = subprocess.run(['javac', '-Xlint:all,-try', '-Werror', '-d', str(d / 'classes'), *map(str, srcs), str(TEST), str(d / 'stub/BuildConfig.java')],
                                capture_output=True, text=True)
             self.assertEqual(r.returncode, 0, r.stdout + r.stderr)

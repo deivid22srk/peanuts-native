@@ -1201,6 +1201,8 @@ public final class MainActivity extends Activity {
                 File pd = pp == null ? null : new File(pp);
                 try { if (pd != null && !Pack.read(pd).titleId.equals(k.id)) pd = null; } catch (IOException e) { pd = null; }
                 k.pack = Folders.find(this, pd, g, k.id);
+                if (k.pack == null && packZipToPack(g, k.id) != null)   // PEANUTS: a pack .zip of Export pack… beside the game (or in its <id>-work folders) is imported here, so a fresh install or another phone plays it without Prepare; a pack folder is found without it (Folders.find above)
+                    k.pack = Folders.find(this, pd, g, k.id);   // the imported pack, as the app's packs/<id> candidate this time
                 if (k.pack == null) k.found = DumpLayout.find(g);   // no pack: whether Prepare can start from it (any layout), or why not (another build, incomplete)
                 else if (!k.pack.pack.gameVersion(g).equals(k.pack.pack.version))   // the pack's build under another version number of this dump: the same code, played as it is
                     android.util.Log.i("nxnative", "Add game: " + g.getName() + " keeps the pack's build (version " + k.pack.pack.version + ") as version " + k.pack.pack.gameVersion(g) + ": same build IDs, same code");
@@ -1212,6 +1214,45 @@ public final class MainActivity extends Activity {
             }
             runOnUiThread(() -> { if (!isFinishing()) added(out, single); });
         }, "nx-add-game").start();
+    }
+
+    /**
+     * A pack .zip of Export pack… beside the game being added (PackZip.exportZip: its folder, the ancestors, the &lt;id&gt;-work folders), imported into the app's
+     * packs/&lt;id&gt; when no pack folder plays with the game yet — Add game then adds the game with it, and a fresh install or another phone plays without Prepare.
+     * PackUi.importRun's checks, on this add thread: an export/import of the title working (PackUi.busy), a Prepare job writing to the pack, the storage's free
+     * space, and PackCheck.blocking (this game's build, unfinished code) before the swap; any failure logs and returns null (the .partial is cleared, and Add game
+     * goes on without a pack: Prepare asks first and offers Import pack…). null also when the game's files hold no pack .zip.
+     */
+    private Pack packZipToPack(File game, String id) {
+        File z = PackZip.exportZip(game, id);
+        if (z == null || PackUi.busy(id)) return null;
+        File packs = AppStorage.packs(this), target = AppStorage.pack(this, id);
+        if (SaveStore.inside(z, packs)) return null;
+        File remembered = Job.remembered(this);
+        if (remembered != null && remembered.isFile()) {
+            try { Job j = Job.read(remembered); if (SaveStore.same(j.pack(), target) && !"done".equals(j.state())) return null; } catch (IOException e) {
+                // not a job of this app's format: it writes nothing
+            }
+        }
+        if (packs.getParentFile() != null && packs.getParentFile().getUsableSpace() < z.length() + (256L << 20)) {
+            android.util.Log.w("nxnative", "[RED] Add game: " + game.getName() + ": " + z.getName() + " needs " + SaveStore.size(z.length()) + " in the app's storage, which has less: not imported");
+            return null;
+        }
+        try {
+            Pack p = PackZip.stage(z, packs, id);
+            try {
+                String bad = PackCheck.blocking(this, p, game);
+                if (bad != null) throw new IOException(bad);
+                PackZip.swapIn(p.dir, target);
+                android.util.Log.i("nxnative", "Add game: " + game.getName() + ": pack zip " + z.getName() + " (" + p.version + ") imported to " + target);
+                return p;
+            } finally {
+                if (p.dir.exists()) SaveStore.deleteTree(p.dir);
+            }
+        } catch (IOException | RuntimeException e) {
+            android.util.Log.w("nxnative", "[RED] Add game: " + game.getName() + ": " + z.getName() + " was not imported: " + e.getMessage());
+            return null;
+        }
     }
 
     private void added(List<Pick> picks, boolean single) {

@@ -65,6 +65,7 @@ public final class PackZipJvmTest {
         wrongTitle(new File(t, "title"));
         damaged(new File(t, "damaged"));
         swap(new File(t, "swap"));
+        zipBeside(new File(t, "beside"));
         System.out.println("ok " + n);
     }
 
@@ -177,5 +178,48 @@ public final class PackZipJvmTest {
         check(!new File(p.dir, "stale.bin").exists(), "the stale .partial was cleared");
         PackZip.swapIn(p.dir, target);
         check(read(new File(target, "main.patched.bin")).equals("code new") && !new File(packs, ID + ".replaced").exists(), "swapped in");
+    }
+
+    /** PackZip.exportZip: the zip of Export pack… beside the game is found (its folder, beside a .nup, a <id>-work folder, the ancestors up to the level bound), the newest of a folder wins; another title's name, a .partial and a level past the bound are not */
+    static void zipBeside(File t) throws Exception {
+        String other = "0400C3F00006E000";
+        File z = PackZip.export(pack(new File(t, "src"), ID, "c0ffee", "a"), new File(t, "out"));
+        File dump = new File(t, "dump");
+        check(dump.mkdirs(), "the dump folder");
+        File inDump = new File(dump, z.getName());
+        Files.copy(z.toPath(), inDump.toPath());
+        check(PackZip.exportZip(dump, ID).equals(inDump), "the zip in the game's folder");
+        check(PackZip.exportZip(dump, other) == null, "another title's name is not picked");
+        File partial = new File(dump, z.getName() + ".partial");
+        Files.copy(z.toPath(), partial.toPath());
+        check(PackZip.exportZip(dump, ID).equals(inDump), "a .partial is not picked");
+        check(PackZip.exportZip(new File(t, "nothing"), ID) == null, "no zip: null");
+        // the newest zip of the folder wins (the -2 of a second export)
+        File older = new File(dump, "banana-pack-" + ID + "-0.zip");
+        Files.copy(z.toPath(), older.toPath());
+        check(inDump.setLastModified(System.currentTimeMillis()) && older.setLastModified(0), "mtimes");
+        check(PackZip.exportZip(dump, ID).equals(inDump), "the newest zip of the folder");
+        // in the game's <id>-work/<any>/ folder, once the folder's own zip is gone
+        File inWork = new File(new File(new File(dump, ID + "-work"), "xlate2-pack"), z.getName());
+        check(inWork.getParentFile().mkdirs(), "the work folder");
+        Files.copy(z.toPath(), inWork.toPath());
+        check(inDump.delete() && older.delete(), "cleared");
+        check(PackZip.exportZip(dump, ID).equals(inWork), "the zip in a <id>-work folder");
+        check(inWork.delete(), "cleared");
+        // beside a .nup (the game is a file): its folder, then the ancestors up to the bound
+        File nup = new File(new File(new File(new File(new File(new File(t, "a"), "b"), "c"), "d"), "e"), "Game [01006BB00C6F0000][v0].nup");
+        write(nup, "nup");
+        File beside = new File(nup.getParentFile(), z.getName());
+        Files.copy(z.toPath(), beside.toPath());
+        check(PackZip.exportZip(nup, ID).equals(beside), "the zip beside a .nup");
+        check(beside.delete() && new File(nup.getParentFile().getParentFile(), z.getName()).createNewFile(), "moved one level up");
+        check(PackZip.exportZip(nup, ID).getName().equals(z.getName()), "the zip an ancestor up");
+        File low = new File(nup.getParentFile().getParentFile(), z.getName());
+        check(low.delete(), "cleared");
+        // t itself is past the bound from nup (a/b/c/d/e: 5 ancestors, the bound is 3)
+        File far = new File(t, z.getName());
+        Files.copy(z.toPath(), far.toPath());
+        check(PackZip.exportZip(nup, ID) == null, "a zip past the ancestor bound is not picked");
+        check(far.delete(), "cleared");
     }
 }
