@@ -94,10 +94,20 @@ final class TouchControls extends View {
     private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG), line = new Paint(Paint.ANTI_ALIAS_FLAG), text = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path path = new Path();
     private final RectF rect = new RectF();
+    // The controls' base colours (bn_touch_*, in both modes): the alpha is built per draw (argb), so no literal RGB is drawn and the whole overlay fades on the opacity setting
+    private final int cFill, cLine, cAccent, cShade, cDim;
+
+    /** A base colour at an alpha (0..255): the token's own channels, so the drawn result is the same as a literal three-channel call was */
+    private static int argb(int alpha, int rgb) { return Color.argb(alpha, Color.red(rgb), Color.green(rgb), Color.blue(rgb)); }
 
     TouchControls(Context c, boolean input) {
         super(c);
         this.input = input;
+        cFill = c.getColor(R.color.bn_touch_fill);
+        cLine = c.getColor(R.color.bn_touch_line);
+        cAccent = c.getColor(R.color.bn_touch_accent);
+        cShade = c.getColor(R.color.bn_touch_shade);
+        cDim = c.getColor(R.color.bn_touch_dim);
         opacity = prefs().getFloat("opacity", 0.6f);
         scale = prefs().getFloat("scale", 1f);
         haptics = prefs().getBoolean("haptics", true);
@@ -509,9 +519,9 @@ final class TouchControls extends View {
         boolean on = active();
         if (button) {
             float ta = on ? 1f : 0.7f;
-            fill.setColor(Color.argb(Math.round(255 * 0.15f * ta), 0, 0, 0));
+            fill.setColor(argb(Math.round(255 * 0.15f * ta), cFill));
             c.drawCircle(tx, ty, tr, fill);
-            line.setColor(Color.argb(Math.round(255 * 0.4f * ta), 255, 255, 255));
+            line.setColor(argb(Math.round(255 * 0.4f * ta), cLine));
             c.drawCircle(tx, ty, tr, line);
             rect.set(tx - tr * 0.6f, ty - tr * 0.3f, tx + tr * 0.6f, ty + tr * 0.35f);
             c.drawRoundRect(rect, tr * 0.3f, tr * 0.3f, line);
@@ -524,8 +534,8 @@ final class TouchControls extends View {
     private void drawControls(Canvas c) {
         for (int i = 0; i < n; i++) {
             boolean held = pressed[i] != 0;
-            fill.setColor(held ? Color.argb(alpha(0.55f), 255, 255, 255) : Color.argb(alpha(0.35f), 0, 0, 0));
-            line.setColor(Color.argb(alpha(0.9f), 255, 255, 255));
+            fill.setColor(held ? argb(alpha(0.55f), cLine) : argb(alpha(0.35f), cFill));
+            line.setColor(argb(alpha(0.9f), cLine));
             if (kind[i] == STICK) drawStick(c, i);
             else if (kind[i] == DPAD) drawDpad(c, i);
             else {
@@ -537,7 +547,7 @@ final class TouchControls extends View {
                     c.drawCircle(cx[i], cy[i], r[i], fill);
                     c.drawCircle(cx[i], cy[i], r[i], line);
                 }
-                text.setColor(held ? Color.argb(alpha(1f), 0, 0, 0) : Color.argb(alpha(1f), 255, 255, 255));
+                text.setColor(held ? argb(alpha(1f), cFill) : argb(alpha(1f), cLine));
                 text.setTextSize(r[i] * (label[i].length() > 1 ? 0.72f : 0.95f));
                 c.drawText(label[i], cx[i], cy[i] - (text.descent() + text.ascent()) / 2, text);
             }
@@ -548,15 +558,15 @@ final class TouchControls extends View {
     private void drawEditor(Canvas c, float dp) {
         int w = getWidth(), h = getHeight();
         float u = unit();
-        line.setColor(Color.argb(200, 255, 210, 60));
+        line.setColor(argb(200, cAccent));
         rect.set(picX * w, picY * h, (picX + picW) * w, (picY + picH) * h);
-        if (dragG == GROUPS) { fill.setColor(Color.argb(50, 255, 210, 60)); c.drawRect(rect, fill); }
+        if (dragG == GROUPS) { fill.setColor(argb(50, cAccent)); c.drawRect(rect, fill); }
         c.drawRect(rect, line);
         for (int g = 0; g < GROUPS; g++) {
             if (gbox[g] == null) continue;
-            line.setColor(g == dragG ? Color.argb(255, 255, 210, 60) : Color.argb(160, 255, 255, 255));
+            line.setColor(g == dragG ? argb(255, cAccent) : argb(160, cLine));
             rect.set(gbox[g]); rect.inset(-4 * u, -4 * u);
-            if (g == dragG) { fill.setColor(Color.argb(60, 255, 210, 60)); c.drawRoundRect(rect, 8 * u, 8 * u, fill); }
+            if (g == dragG) { fill.setColor(argb(60, cAccent)); c.drawRoundRect(rect, 8 * u, 8 * u, fill); }
             c.drawRoundRect(rect, 8 * u, 8 * u, line);
         }
         float bw = 74 * u, bh = 34 * u, gap = 8 * u, x = (w - (TOOL.length * bw + (TOOL.length - 1) * gap)) / 2, y = 14 * u;
@@ -565,15 +575,15 @@ final class TouchControls extends View {
             if (tool[k] == null) tool[k] = new RectF();
             tool[k].set(x, y, x + bw, y + bh);
             boolean cur = k <= 2 && Math.abs(placeY - k * 0.5f) < 0.01f;
-            fill.setColor(k == 4 ? Color.argb(230, 255, 210, 60) : cur ? Color.argb(230, 255, 255, 255) : Color.argb(200, 40, 40, 40));
+            fill.setColor(k == 4 ? argb(230, cAccent) : cur ? argb(230, cLine) : argb(200, cShade));
             c.drawRoundRect(tool[k], 8 * u, 8 * u, fill);
-            line.setColor(Color.argb(220, 255, 255, 255));
+            line.setColor(argb(220, cLine));
             c.drawRoundRect(tool[k], 8 * u, 8 * u, line);
             text.setColor(k == 4 || cur ? Color.BLACK : Color.WHITE);
             c.drawText(TOOL[k], tool[k].centerX(), tool[k].centerY() - (text.descent() + text.ascent()) / 2, text);
         }
         text.setTextSize(Tokens.TYPE_SMALL * u);
-        text.setColor(Color.argb(230, 255, 255, 255));
+        text.setColor(argb(230, cLine));
         String hint = dragG >= 0 && dragG < GROUPS ? GROUP_NAME[dragG] + ": drag to move, a second finger to resize (" + Math.round(gsc[dragG] * 100) + " %)"
                 : dragG == GROUPS ? "picture: drag into the black bars" : "Drag a control or the picture; pinch a control to resize it";
         c.drawText(hint, w / 2f, y + bh + 22 * u, text);
@@ -582,18 +592,18 @@ final class TouchControls extends View {
     private void drawStick(Canvas c, int i) {
         float sx = sticks[2 * stick[i]], sy = sticks[2 * stick[i] + 1];
         boolean held = sx != 0 || sy != 0;
-        fill.setColor(Color.argb(alpha(0.25f), 0, 0, 0));
+        fill.setColor(argb(alpha(0.25f), cFill));
         c.drawCircle(cx[i], cy[i], r[i], fill);
         c.drawCircle(cx[i], cy[i], r[i], line);
         float k = r[i] * 0.55f, kx = cx[i] + sx * k, ky = cy[i] - sy * k;
-        fill.setColor(held ? Color.argb(alpha(0.6f), 255, 255, 255) : Color.argb(alpha(0.4f), 90, 90, 90));
+        fill.setColor(held ? argb(alpha(0.6f), cLine) : argb(alpha(0.4f), cDim));
         c.drawCircle(kx, ky, r[i] * 0.45f, fill);
         c.drawCircle(kx, ky, r[i] * 0.45f, line);
     }
 
     private void drawDpad(Canvas c, int i) {
         float x = cx[i], y = cy[i], rr = r[i], w = rr * 0.36f;
-        fill.setColor(Color.argb(alpha(0.25f), 0, 0, 0));
+        fill.setColor(argb(alpha(0.25f), cFill));
         c.drawCircle(x, y, rr, fill);
         c.drawCircle(x, y, rr, line);
         long[] dirs = {UP, RIGHT, DOWN, LEFT};
@@ -608,7 +618,7 @@ final class TouchControls extends View {
                 if (j == 0) path.moveTo(x + px, y + py); else path.lineTo(x + px, y + py);
             }
             path.close();
-            fill.setColor(held ? Color.argb(alpha(0.9f), 255, 255, 255) : Color.argb(alpha(0.35f), 255, 255, 255));
+            fill.setColor(held ? argb(alpha(0.9f), cLine) : argb(alpha(0.35f), cLine));
             c.drawPath(path, fill);
         }
     }

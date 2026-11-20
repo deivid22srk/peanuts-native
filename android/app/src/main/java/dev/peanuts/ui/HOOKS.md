@@ -1,11 +1,13 @@
 # dev.peanuts.ui — the library inside Banana's Home
 
 Banana's Home (`dev.nxnative.android.MainActivity`) is the one home: its game box is filled by `Library.fill`, its Settings page starts with `LibrarySettings.add`,
-its pickers' results pass through `LibrarySettings.result`, its Manage sheet has one Peanuts row (`GameSheet.open`). The look comes from `PUi`, a verbatim copy of
-upstream's package-private `Ui` on the same `R.color`/`R.drawable` resources (`diff Ui.java PUi.java | grep -v '^[<>] *\(package\|import dev\|public\)'` is the
+its pickers' results pass through `LibrarySettings.result`, its Manage sheet has one Peanuts row (`GameSheet.open`). The look comes from `PUi`, a visual line-for-line
+copy of upstream's package-private `Ui` on the same `R.color`/`R.drawable` resources (not behavioural: the five `Feel` wrappers are not copied, see PUi's javadoc)
+(`diff Ui.java PUi.java | grep -v '^[<>] *\(package\|import dev\|public\)'` is the
 drift check; re-copy when upstream changes `Ui.java`). The five `dev.peanuts.ui.Feel` lines of `Ui.java` (marked `PEANUTS`) are not copied: Peanuts' screens
 call `Haptics` themselves, and both would play. `PUi` imports upstream's `R`, and the public `Tokens` and `PadFocus.Builder` (made public for this copy), so
-the copy stays line-for-line. The PUi-only bits are marked `PEANUTS` in the file: `PUi.joined` (the thin-bar separator `Library`'s build lines use) and
+the copy stays line-for-line. The PUi-only bits are marked `PEANUTS` in the file: `PUi.joined` (the thin-bar separator `Library`'s build lines use), `PUi.tap`
+(a public focus edge + ripple for the fork's own rows) and
 `PUi.status`'s `TextUtils.concat` (it keeps `joined`'s spans where `Ui` string-concatenates). Everything else must match.
 
 ## Upstream hooks (each one line, tagged `PEANUTS`)
@@ -14,13 +16,13 @@ the copy stays line-for-line. The PUi-only bits are marked `PEANUTS` in the file
 |---|---|
 | `MainActivity.build()` | `Ui.page(this, frame, 900)` — 640 → 900 dp: four covers per row on a handheld |
 | `MainActivity.buildSettings()` | `dev.peanuts.ui.LibrarySettings.add(this, content);` before the Updates section |
-| `MainActivity.refresh()` | `dev.peanuts.ui.Library.fill(this, gameBox, games, Ondevice.cardView(), Ondevice::shows, this::gameCard, this::manage, this::refresh);` in place of the "Your games" block |
+| `MainActivity.refresh()` | `dev.peanuts.ui.Library.fill(this, gameBox, games, Ondevice.cardView(), Ondevice::shows, this::gameCard, this::addGame, this::manage, this::refresh);` in place of the "Your games" block |
 | `MainActivity.manage()` | the `🔨 Build again` row → `dev.peanuts.ui.GameSheet.open(this, g.titleId)` |
 | `MainActivity.onActivityResult()` | `if (dev.peanuts.ui.LibrarySettings.result(this, request, result, data)) return;` first (requests 60–66) |
 | `AndroidManifest.xml` | `CatalogActivity` under `@style/Theme.Banana`; no Peanuts launcher entry (MainActivity keeps LAUNCHER) |
 | `src/ondevice/AndroidManifest.xml` | the `BuildService` line (import → Prepare → companion) |
 
-`gameCard`, `manage`, `refresh` stay private in MainActivity: the hook passes them as method references (`addGame` stays in MainActivity, unused by Home since SPEC3).
+`gameCard`, `addGame`, `manage`, `refresh` stay private in MainActivity: the hook passes them as method references (`addGame` is also the empty library's action, Library's empty state).
 
 ## Pieces
 

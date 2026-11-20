@@ -16,6 +16,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 
+import dev.nxnative.android.R;
+import dev.nxnative.android.Tokens;
+
 /** Internal preparation mode of the non-exported GameActivity; never a normal play session. */
 public final class ShaderCapture {
     private static final String DIR = "pn_capture_dir", SAVE = "pn_capture_save", KEYS = "pn_capture_keys";
@@ -59,14 +62,14 @@ public final class ShaderCapture {
         LinearLayout box = new LinearLayout(a);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setGravity(Gravity.CENTER);
-        box.setBackgroundColor(0xff101714);
+        box.setBackgroundColor(a.getColor(R.color.bn_dev_bg));
         box.setClickable(true);
         box.addView(new ProgressBar(a));
         TextView text = new TextView(a);
         text.setText("Finishing graphics setup\n\nThis step finishes automatically.");
         text.setGravity(Gravity.CENTER);
         text.setTextColor(Color.WHITE);
-        text.setTextSize(20);
+        text.setTextSize(Tokens.TYPE_HEADING);
         int pad = Math.round(24 * a.getResources().getDisplayMetrics().density);
         text.setPadding(pad, pad, pad, pad);
         box.addView(text);

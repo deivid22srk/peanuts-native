@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.Presentation;
 import android.content.Context;
-import android.graphics.Color;
 import android.hardware.display.DisplayManager;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,6 +15,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import dev.nxnative.android.R;
 import dev.nxnative.android.Tokens;
 
 import java.util.ArrayList;
@@ -70,11 +70,11 @@ public final class ScreensOff {
 
     private static void cover(Dialog d, Activity a, boolean hint) {
         FrameLayout root = new FrameLayout(d.getContext());
-        root.setBackgroundColor(Color.BLACK);
+        root.setBackgroundColor(PUi.col(d.getContext(), R.color.bn_black));
         if (hint) {   // said once, then gone: nothing stays lit
             TextView t = new TextView(d.getContext());
             t.setText("The build goes on. Tap a screen to bring it back.");
-            t.setTextColor(0xFF8A8A8A);
+            t.setTextColor(PUi.col(d.getContext(), R.color.bn_screens_off));
             t.setTextSize(Tokens.TYPE_BODY);
             t.setGravity(Gravity.CENTER);
             root.addView(t, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));

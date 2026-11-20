@@ -29,9 +29,15 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 /**
- * PEANUTS: a verbatim copy of dev.nxnative.android.Ui (package-private upstream) on the same resources, so Peanuts screens look the same without an upstream edit.
- * Check against upstream: diff Ui.java PUi.java | grep -v "^[<>] *\(package\|import dev\|public\)". The Feel lines marked PEANUTS there are not copied here;
- * the PUi-only bits below are marked PEANUTS too.
+ * PEANUTS: a visual line-for-line copy of dev.nxnative.android.Ui (package-private upstream) on the same resources, so Peanuts screens look the same without an
+ * upstream edit. Check against upstream: diff Ui.java PUi.java | grep -v "^[<>] *\(package\|import dev\|public\)"; the PUi-only bits below are marked PEANUTS too.
+ * <p>
+ * It is NOT a behavioural copy: Ui's five {@code dev.peanuts.ui.Feel} wrappers (Feel.button, Feel.row, Feel.toggled, Feel.picked, Feel.nav — the lines marked
+ * PEANUTS in Ui.java) are deliberately left out here. The fork's own screens ({@code Library}, {@code DriverActivity}, {@code GameSheet}, {@code LibrarySettings},
+ * {@code CompanionVersions}, {@code dev.peanuts.settings}) play their haptics themselves, at the call site ({@code Haptics.on}/{@code Haptics.play}/{@code Feel.*}),
+ * so a second Feel wrapper inside PUi would fire twice for every press. Path chosen: one haptic, played by the screen, with the javadoc stating it plainly instead of
+ * claiming a verbatim behavioural copy (the earlier wording did). The one addition for the fork's screens is {@link #tap}, a public focus-edge-plus-ripple helper.
+ * <p>
  * The launcher's building blocks, in code like the rest of the launcher (no layouts, no AndroidX), in the banana palette (res/values/colors.xml, values-night for dark
  * mode; themes.xml's Theme.Banana). One small design system so every screen looks the same:
  * <ul>
@@ -82,6 +88,12 @@ public final class PUi {
         s.addState(new int[]{}, ripple(c, round(fill, dp(c, radiusDp), 0, 0)));
         v.setBackground(s);
     }
+
+    // PEANUTS begin: PUi-only - a public way for the fork's own rows (ModsSection's bin, DriverActivity's list rows) to get the same transparent-fill focus edge
+    // and ripple touchable() gives PUi's own rows, so their focus reads like a Ui.Setting row's instead of a bare ripple
+    /** The touch ripple and hairline accent focus edge of a plain row, applied to v (fill: transparent) */
+    public static void tap(Context c, View v, float radiusDp) { touchable(c, v, Color.TRANSPARENT, radiusDp, R.color.bn_accent); }
+    // PEANUTS end
 
     public static Typeface face(int weight) { return Typeface.create(Typeface.SANS_SERIF, weight, false); }
 
@@ -649,7 +661,7 @@ public final class PUi {
     public static ProgressBar progress(Context c) {
         ProgressBar bar = new ProgressBar(c, null, android.R.attr.progressBarStyleHorizontal);
         bar.setProgressTintList(ColorStateList.valueOf(col(c, R.color.bn_accent)));   // the deep gold clears 3:1 against the track where the banana does not
-        bar.setProgressBackgroundTintList(ColorStateList.valueOf(col(c, R.color.bn_card_stroke)));
+        bar.setProgressBackgroundTintList(ColorStateList.valueOf(col(c, R.color.bn_track)));
         bar.setScaleY(1.6f);
         return bar;
     }

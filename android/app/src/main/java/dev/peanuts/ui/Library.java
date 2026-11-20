@@ -41,6 +41,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import dev.nxnative.android.R;
+import dev.nxnative.android.Tokens;
 import dev.peanuts.PeanutsPrefs;
 import dev.peanuts.build.BuildListener;
 import dev.peanuts.build.BuildPipeline;
@@ -69,7 +70,7 @@ import java.util.function.Predicate;
  * filter exists only while something runs and holds the full cards: the build card (Ondevice's shape: status, a sentence, the bar, Stop/Retry and a disabled Play)
  * and upstream's progress card (Ondevice); everywhere else the building game is a cover with a progress strip and a "Building · N %" chip that opens that filter.
  * The games come from {@link LibraryScanner} (every NSP/XCI/.nup/dump in the game folder) merged with upstream's own list: a scanned game that is ready is put
- * into upstream's list so Play and Manage are Banana's. With no game folder set, the first-run card (emptyCard's shape with three Setting rows) is Home's one card.
+ * into upstream's list so Play and Manage are Banana's. With no game folder set, the first-run card (setupCard: the badge, a heading and Setting rows) is Home's one card.
  */
 public final class Library {
     private static final int ALL = 0, BUILDING = 1, READY = 2, BUILD = 3, NO_PROFILE = 4;
@@ -133,7 +134,8 @@ public final class Library {
     private List<?> games = Collections.emptyList();
     private View ondeviceCard;
     private Predicate<Object> shows = g -> false;
-    private Function<Object, View> card = g -> null;
+    private Function<Object, View> card = g -> null;   // upstream's own game card, kept in the hook's shape (Library draws the covers, not the cards)
+    private Runnable addGame = () -> {};   // upstream's own Add game, from Library.fill: the empty library's primary action
     private Consumer<Object> manage = g -> {};
     private Runnable refresh = () -> {};
     private List<LibraryScanner.Title> titles = lastTitles;
@@ -267,11 +269,11 @@ public final class Library {
         column.setGravity(Gravity.CENTER_HORIZONTAL);
         column.addView(PUi.iconButton(a, iconRes, description, PUi.Kind.TONAL, action));
 
-        TextView caption = PUi.text(a, label, 10, R.color.bn_accent, 700);
+        TextView caption = PUi.text(a, label, Tokens.HEADER_CAPTION_SP, R.color.bn_accent, 700);
         caption.setSingleLine(true);
         caption.setGravity(Gravity.CENTER);
         caption.setPadding(0, PUi.dp(a, 2), 0, 0);
-        caption.setMinHeight(PUi.dp(a, 16));
+        caption.setMinHeight(PUi.dp(a, Tokens.SPACE_4));
         caption.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
         if (key != null) {
             caption.setCompoundDrawablesRelativeWithIntrinsicBounds(key, null, null, null);
@@ -296,15 +298,16 @@ public final class Library {
 
     /**
      * MainActivity.refresh's game box: games is upstream's list, ondeviceCard its progress card when it shows (Ondevice.cardView), shows says whether that card is a
-     * game's (Ondevice.shows), card makes a game's own card (gameCard; unused since the covers, kept for the hook's shape), manage opens its Manage sheet, refresh is refresh() itself
+     * game's (Ondevice.shows), card makes a game's own card (gameCard; kept for the hook's shape, the covers draw the games), addGame is upstream's own Add game (the
+     * empty library's primary action), manage opens its Manage sheet, refresh is refresh() itself
      */
     @SuppressWarnings("unchecked")
-    public static <G> void fill(Activity a, LinearLayout box, List<G> games, View ondeviceCard, Predicate<G> shows, Function<G, View> card, Consumer<G> manage, Runnable refresh) {
+    public static <G> void fill(Activity a, LinearLayout box, List<G> games, View ondeviceCard, Predicate<G> shows, Function<G, View> card, Runnable addGame, Consumer<G> manage, Runnable refresh) {
         if (current == null || current.a != a) current = new Library(a);
         Library l = current;
         l.box = box; l.games = new ArrayList<>(games); l.ondeviceCard = ondeviceCard; gen++;
         Consumer<Object> m = (Consumer<Object>) manage;
-        l.shows = (Predicate<Object>) shows; l.card = (Function<Object, View>) card; l.refresh = refresh;
+        l.shows = (Predicate<Object>) shows; l.card = (Function<Object, View>) card; l.addGame = addGame; l.refresh = refresh;
         l.manage = g -> { BottomScreen.page(a); m.accept(g); };   // bottom screen: logo
         if (build != null) {
             if (BuildPipeline.running() == build.id) BuildPipeline.attach(build.id, l.listener);   // an activity made anew while the service builds
@@ -820,7 +823,7 @@ public final class Library {
         chip(chipRow, "All " + all, ALL);
         if (building > 0) {
             SpannableString s = new SpannableString("Building " + building);
-            if (filter != BUILDING) s.setSpan(new ForegroundColorSpan(PUi.col(a, R.color.bn_banana)), 9, s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);   // the count in banana: something runs
+            if (filter != BUILDING) s.setSpan(new ForegroundColorSpan(PUi.col(a, R.color.bn_accent)), 9, s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);   // the count in the deep-gold accent (the chip is tonal: the banana read 1.3:1 on the tint)
             chip(chipRow, s, BUILDING);
         }
         chip(chipRow, "Ready " + ready, READY);
@@ -849,12 +852,22 @@ public final class Library {
         LinearLayout.LayoutParams flp = PUi.wrap(); flp.leftMargin = PUi.dp(a, 8);
         top.addView(findB, flp);
         PUi.add(box, top, setup ? 16 : 2);
-        TextView note = null;   // the scan's line, or the empty library's: it fades in when the last rebuild did not have it
+        View note = null;   // the scan's line, or the empty library's block: it fades in when the last rebuild did not have it
         if (scanning) {
             int n = PeanutsPrefs.roots(a).size();
-            note = PUi.add(box, PUi.small(a, "Looking in " + n + (n == 1 ? " folder…" : " folders…")), 8);
+            LinearLayout scanRow = PUi.row(a);
+            ProgressBar bar = PUi.progress(a);   // the scan walks the folders: an indeterminate bar, as the driver page and the build card show for a wait
+            bar.setIndeterminate(true);
+            scanRow.addView(bar, new LinearLayout.LayoutParams(PUi.dp(a, 72), PUi.dp(a, Tokens.SPACE_1)));
+            TextView line = PUi.small(a, "Looking in " + n + (n == 1 ? " folder…" : " folders…"));
+            LinearLayout.LayoutParams slp = PUi.weight();
+            slp.leftMargin = PUi.dp(a, Tokens.SPACE_2);
+            scanRow.addView(line, slp);
+            note = PUi.add(box, scanRow, 8);
         } else if (rows.isEmpty() && pc == null && !setup) {
-            note = PUi.add(box, PUi.small(a, "No games found in " + PeanutsPrefs.gameDir(a) + ". Put NSP, XCI, .nup files or dump folders there, then Rescan (Settings › Library)."), 8);
+            note = PUi.add(box, PUi.emptyState(a, "No games found",
+                    "Nothing in " + PeanutsPrefs.gameDir(a) + " yet. Put NSP, XCI, .nup files or dump folders there, then Rescan.",
+                    emptyActions()), 8);
         }
         if (note != null && !hadNote) Motion.fadeIn(note);
         hadNote = note != null;
@@ -871,7 +884,9 @@ public final class Library {
             return;
         }
 
-        int cell = (Math.min(widthDp(), 900) - 40 - PUi.GAP * (cols - 1)) / cols;   // Banana's 20 dp gutters and 12 dp gaps
+        int gutter = widthDp() < 360 ? Tokens.SPACE_4 : Tokens.SPACE_5;   // the page column's own gutter (Ui.page)
+        int column = Math.min(widthDp(), Tokens.PAGE_MAX_DP) - 2 * gutter;   // the content column width Ui.page gives this box (same cap and gutter)
+        int cell = Math.max(0, (column - PUi.GAP * (cols - 1)) / cols);   // the cover cell: the column less the grid's gaps, per column
         List<View> cells = new ArrayList<>();
         for (Row r : show) cells.add(coverCell(r, cell));
         grid(cells, cols, 16);
@@ -1048,6 +1063,15 @@ public final class Library {
 
     // ---- The covers ----
 
+    /** The empty library's actions: upstream's own Add game (primary) and a Rescan (tonal), each with the library's own haptic and the L/R shoulder keys */
+    private View emptyActions() {
+        Button add = PUi.button(a, "Add game", PUi.Kind.PRIMARY, Haptics.on(Haptics.Word.CLICK, v -> addGame.run()));
+        Button rescan = PUi.button(a, "Rescan", PUi.Kind.TONAL, Haptics.on(Haptics.Word.CLICK, v -> scan()));
+        add.setOnKeyListener(shoulders);
+        rescan.setOnKeyListener(shoulders);
+        return PUi.pair(a, add, rescan);
+    }
+
     /**
      * One cell of the grid: the cover (PUi's tile at cell size, the NACP icon once it has landed) with the state on it, the name under it. The cover is the focusable,
      * clickable thing: a tap plays a ready game, opens the Building filter for a building one, the sheet or Manage otherwise; a long press (or Y) opens Manage
@@ -1082,17 +1106,17 @@ public final class Library {
         // the ripple under the cover (masked to its 16 dp corners) and the focus ring, 3 dp outside the cover's edge (bn_accent: 5.1:1 on the cream background,
         // where the banana read 1.4:1; Ui.touchable and PadFocus.frame use the same colour)
         StateListDrawable ring = new StateListDrawable();
-        ring.addState(new int[] {android.R.attr.state_focused}, PUi.round(Color.TRANSPARENT, PUi.dp(a, 20), PUi.col(a, R.color.bn_accent), PUi.dp(a, 3)));
+        ring.addState(new int[] {android.R.attr.state_focused}, PUi.round(Color.TRANSPARENT, PUi.dp(a, Tokens.RADIUS_LG), PUi.col(a, R.color.bn_accent), PUi.dp(a, 3)));
         ring.addState(new int[0], new ColorDrawable(Color.TRANSPARENT));
-        RippleDrawable ripple = new RippleDrawable(a.getColorStateList(R.color.bn_control_ripple), null, new InsetDrawable(PUi.round(Color.BLACK, PUi.dp(a, 16), 0, 0), p4));   // the theme widget highlight (the colour PUi.ripple resolves); the content stays transparent and the mask keeps its 4 dp inset, so the helper itself would change the cover's look
+        RippleDrawable ripple = new RippleDrawable(a.getColorStateList(R.color.bn_control_ripple), null, new InsetDrawable(PUi.round(Color.BLACK, PUi.dp(a, Tokens.RADIUS_INNER), 0, 0), p4));   // the theme widget highlight (the colour PUi.ripple resolves); the content stays transparent and the mask keeps its 4 dp inset, so the helper itself would change the cover's look
         cover.setForeground(new LayerDrawable(new Drawable[] {ripple, ring}));
 
-        int coverDp = cellDp - 8;   // the cell less the 4 dp the focus ring needs on each side: the cover stays square
+        int coverDp = cellDp - 2 * Tokens.FOCUS_RING_GAP_DP;   // the cell less the ring's 4 dp on each side: the cover stays square
         TextView tile = PUi.tile(a, name, coverDp);
         tile.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, PUi.dp(a, coverDp)));
         Bitmap bm = icons.get(r.id());
         if (bm != null) PUi.tileIcon(tile, bm);
-        if (!building && st == NO_PROFILE) tile.setAlpha(0.45f);
+        if (!building && st == NO_PROFILE) tile.setAlpha(0.45f);   // only the cover art dims: the name below stays fully legible (WCAG 1.4.3), and the "Not Supported Yet" pill on the cover says the state
         tiles.put(r.id(), tile);
         cover.addView(tile);
 
@@ -1128,7 +1152,8 @@ public final class Library {
 
         // the name
         int nameColor = !building && st == NO_PROFILE ? R.color.bn_text_2 : R.color.bn_text;
-        TextView n = PUi.text(a, name, 14, nameColor, 600);
+        TextView n = PUi.text(a, name, Tokens.TYPE_LABEL, nameColor, 600);
+        n.setAlpha(1f);   // a not-supported cover dims only its art: the name keeps bn_text_2's 5.3:1 on the cream
         n.setMaxLines(2);
         n.setEllipsize(TextUtils.TruncateAt.END);
         n.setBreakStrategy(Layout.BREAK_STRATEGY_SIMPLE);
@@ -1138,7 +1163,7 @@ public final class Library {
         nlp.setMargins(p4, p4, p4, 0);
         String key = "cover:" + r.id();
         cover.setOnFocusChangeListener((v, f) -> {
-            n.setTextColor(PUi.col(a, f ? R.color.bn_banana : nameColor));   // at once: a colour animation would redraw the text every frame
+            n.setTextColor(PUi.col(a, f ? R.color.bn_accent : nameColor));   // at once: a colour animation would redraw the text every frame. bn_accent, not bn_banana: the banana reads 1.3:1 on the cream (WCAG 1.4.3)
             noteFocus(key, f);
             Motion.focus(tile, f, restoring);
         });
@@ -1206,18 +1231,18 @@ public final class Library {
         return t;
     }
 
-    /** The building cover's 6 dp progress strip along the bottom edge, 8 dp inset: banana deep on 70 % of the screen's colour; indeterminate for upstream's Prepare */
+    /** The building cover's 6 dp progress strip along the bottom edge, 8 dp inset: the deep-gold accent on a translucent dark track; indeterminate for upstream's Prepare */
     private ProgressBar strip(boolean indeterminate) {
         ProgressBar p = new ProgressBar(a, null, android.R.attr.progressBarStyleHorizontal);
         p.setMax(100);
         p.setIndeterminate(indeterminate);
-        int track = (PUi.col(a, R.color.bn_bg) & 0x00FFFFFF) | 0xB3000000;
-        GradientDrawable fill = PUi.round(PUi.col(a, R.color.bn_banana_deep), PUi.dp(a, 3), 0, 0);
+        int track = PUi.col(a, R.color.bn_strip_track);
+        GradientDrawable fill = PUi.round(PUi.col(a, R.color.bn_accent), PUi.dp(a, 3), 0, 0);   // bn_accent, like Ui.progress: the banana deep read 1.4:1 on the track (below 3:1)
         LayerDrawable ld = new LayerDrawable(new Drawable[] {PUi.round(track, PUi.dp(a, 3), 0, 0), new ClipDrawable(fill, Gravity.START, ClipDrawable.HORIZONTAL)});
         ld.setId(0, android.R.id.background);
         ld.setId(1, android.R.id.progress);
         p.setProgressDrawable(ld);
-        p.setIndeterminateTintList(ColorStateList.valueOf(PUi.col(a, R.color.bn_banana_deep)));
+        p.setIndeterminateTintList(ColorStateList.valueOf(PUi.col(a, R.color.bn_accent)));
         p.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, PUi.dp(a, 6), Gravity.BOTTOM);
         int p8 = PUi.dp(a, 8);
@@ -1410,7 +1435,7 @@ public final class Library {
         LinearLayout info = new LinearLayout(a);
         info.setOrientation(LinearLayout.VERTICAL);
         info.setPadding(PUi.dp(a, 14), 0, PUi.dp(a, 4), 0);
-        TextView n = PUi.text(a, name, 17, R.color.bn_text, 700);
+        TextView n = PUi.text(a, name, Tokens.TYPE_CARD_TITLE, R.color.bn_text, 700);
         n.setMaxLines(2);
         n.setEllipsize(TextUtils.TruncateAt.END);
         info.addView(n);
@@ -1600,7 +1625,7 @@ public final class Library {
 
     // ---- First run ----
 
-    /** emptyCard's shape: the badge, a heading, the four steps (P5: Updates & DLC folded in as its own numbered row, no longer a quiet
+    /** The first-run card: the badge, a heading, the four steps (P5: Updates & DLC folded in as its own numbered row, no longer a quiet
      *  footnote button), the four Setting rows, then the single "Show my games" action */
     private View setupCard() {
         LinearLayout c = PUi.card(a);

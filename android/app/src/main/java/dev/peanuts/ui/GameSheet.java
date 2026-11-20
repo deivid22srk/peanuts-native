@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import dev.nxnative.android.R;
+import dev.nxnative.android.Tokens;
 import dev.peanuts.PeanutsPrefs;
 import dev.peanuts.build.PackNote;
 import dev.peanuts.build.Reimport;
@@ -350,11 +351,11 @@ public final class GameSheet {
         row.setOrientation(LinearLayout.HORIZONTAL);
         TextView tile = PUi.text(a, "🧩", 18, R.color.bn_text, 400);   // puzzle piece, matches the mockup's Version row icon
         tile.setGravity(android.view.Gravity.CENTER);
-        tile.setBackground(PUi.round(PUi.col(a, R.color.bn_tint), PUi.dp(a, 12), 0, 0));
+        tile.setBackground(PUi.round(PUi.col(a, R.color.bn_tint), PUi.dp(a, Tokens.RADIUS_ROW), 0, 0));
         tile.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-        row.addView(tile, new LinearLayout.LayoutParams(PUi.dp(a, 40), PUi.dp(a, 40)));
+        row.addView(tile, new LinearLayout.LayoutParams(PUi.dp(a, Tokens.TILE_DP), PUi.dp(a, Tokens.TILE_DP)));
         LinearLayout.LayoutParams clp = PUi.fill();
-        clp.setMargins(PUi.dp(a, 14), 0, PUi.dp(a, 8), 0);
+        clp.setMargins(PUi.dp(a, Tokens.SPACE_3), 0, PUi.dp(a, Tokens.SPACE_2), 0);
         row.addView(col, clp);
         PUi.add(box, row, 10);
     }

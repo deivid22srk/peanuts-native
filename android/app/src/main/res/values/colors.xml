@@ -7,15 +7,17 @@
          Contrast ratios (WCAG 2.1, checked by script; text needs 4.5:1, UI shapes and icons 3:1) name the pair each color is drawn in -->
     <color name="bn_bg">#FFFFF6E0</color>            <!-- the screen: cream (text on bg 12.7:1, secondary text on bg 5.3:1) -->
     <color name="bn_card">#FFFFFDF6</color>          <!-- cards and dialogs (text on card 13.5:1, secondary text on card 5.6:1) -->
-    <color name="bn_card_stroke">#FFF1DFAE</color>   <!-- hairline card edge, dividers, progress track -->
+    <color name="bn_card_stroke">#FFB07A20</color>   <!-- hairline card edge, dividers: a roasted brown dark enough to clear 3:1 on the page (3.4:1) and the card (3.6:1) -->
+    <color name="bn_track">#FFF1DFAE</color>         <!-- a progress bar's track (Ui.progress, the cover's build strip): light enough for the deep-gold fill to clear 3:1 on it (the card edge above is darker, for the card's own 3:1) -->
+    <color name="bn_strip_track">#B3000000</color>   <!-- the building cover's progress strip behind the art: a translucent black that never fights the cover (fill: bn_accent) -->
     <color name="bn_tint">#FFFFF0C2</color>          <!-- tonal buttons, icon tiles, chips (text on tint 12.1:1, accent on tint 4.8:1) -->
     <color name="bn_banana">#FFFFD43B</color>        <!-- primary buttons (on_banana on banana 10.0:1) -->
     <color name="bn_banana_deep">#FFF2B705</color>   <!-- pressed primary accent, strong borders on warning surfaces -->
     <color name="bn_on_banana">#FF3B2611</color>     <!-- text on banana yellow (10.0:1 on banana; both modes) -->
     <color name="bn_text">#FF3B2A1A</color>          <!-- body text (13.5:1 on card, 12.7:1 on bg, 12.1:1 on tint) -->
     <color name="bn_text_2">#FF7A6347</color>        <!-- secondary text (5.6:1 on card, 5.3:1 on bg, 5.0:1 on tint) -->
-    <color name="bn_accent">#FF925F00</color>        <!-- check boxes, switches, dialog buttons, tags, quiet buttons: a deep gold that reads on cream
-                                                          (5.3:1 on card, 5.1:1 on bg, 4.8:1 on tint, 4.1:1 on card_stroke) -->
+    <color name="bn_accent">#FF925F00</color>        <!-- check boxes, switches, dialog buttons, tags, quiet buttons, focus edges: a deep gold that reads on cream
+                                                          (5.3:1 on card, 5.1:1 on bg, 4.8:1 on tint, 3.3:1 on card_stroke) -->
     <color name="bn_leaf">#FF1E5B3A</color>          <!-- the brand green: the badge circle behind the banana in Home's header (Ui.badge) is bn_badge, not this -->
     <color name="bn_badge">#FF1E5B3A</color>         <!-- the header badge's circle: the launcher icon's deep green (ic_launcher_background) in BOTH modes — bn_leaf lightens
                                                           for dark, and on the lightened green the yellow banana would sink (1.4:1; on this deep green 5.6:1) -->
@@ -27,4 +29,55 @@
     <color name="bn_warn">#FF8A5200</color>          <!-- warning text (6.3:1 on card, 5.3:1 on warn_tint) -->
     <color name="bn_ok_tint">#FFDFF0E0</color>       <!-- success container: the Readiness check's PASS rows (ReadinessActivity.row), beside the fail and warn rows' tints (ok text on it 6.8:1) -->
     <color name="bn_control_ripple">#336B4423</color><!-- theme widget highlight/ripple (Ui.ripple's peel brown at 20%) -->
+
+    <!-- The in-game panel (SidePanel, PanelPolish, HudSettings) and the controller applet screen (CtrlScreen) are a fixed dark sheet that floats over the running
+         game in BOTH modes, so they have their own set. Their accent is the banana itself: one yellow in the app, never a second #FFD54F -->
+    <color name="bn_panel_accent">#FFFFD43B</color>  <!-- the selected tab / pill's fill, a choice's value (dark text on it via bn_panel_on_pill) -->
+    <color name="bn_panel_on_pill">#FF000000</color> <!-- the label on the selected tab / pill -->
+    <color name="bn_panel_pill">#FFE8EAED</color>    <!-- the panel's own label grey (an unselected tab / pill's label) -->
+    <color name="bn_panel_outline">#FF555555</color>  <!-- an unselected pill's edge -->
+    <color name="bn_panel_fill">#FF555555</color>    <!-- a panel button's fill fallback when the theme names none -->
+    <color name="bn_panel_label">#FFC8C8C8</color>   <!-- a panel section heading -->
+    <color name="bn_panel_note">#FF8A8A8A</color>    <!-- a panel grey note -->
+    <color name="bn_panel_scrim">#66000000</color>   <!-- SidePanel: its 40% black scrim over the game (SidePanel's own scrim, not bn_scrim: that one is opaque) -->
+    <color name="bn_panel_sheet">#F0202124</color>   <!-- SidePanel: the tab bar's sheet background -->
+    <color name="bn_panel_tabs">#FF2D2E31</color>    <!-- SidePanel: the tab bar itself -->
+    <color name="bn_panel_focus_rim">#26FFD54F</color> <!-- SidePanel.focusMoved: the focused row's frame fill (16% banana), its edge is bn_panel_accent -->
+    <color name="bn_panel_bg">#E0101418</color>      <!-- CtrlScreen: the controller applet's join card -->
+    <color name="bn_panel_hint">#FFB8C4CC</color>    <!-- CtrlScreen: its hint and card text -->
+    <color name="bn_panel_slot">#FF2E3A44</color>    <!-- CtrlScreen: a joined controller's card slot fill -->
+    <color name="bn_panel_slot_outline">#FF55626C</color> <!-- CtrlScreen: an empty slot's outline -->
+    <color name="bn_screens_off">#FF8A8A8A</color>   <!-- the "Screens off" cover's hint line on the black -->
+
+    <!-- Black surfaces: the second display's dim scrim, the "Screens off" cover, the companion page's letterbox -->
+    <color name="bn_scrim">#FF000000</color>
+    <color name="bn_black">#FF000000</color>
+    <color name="bn_dev_bg">#FF14120C</color>        <!-- the companion development text view and the graphics-preparation screen: a warm near-black in both modes -->
+    <color name="bn_dev_title">#FFFFD95A</color>     <!-- its peach-yellow brand line -->
+
+    <!-- The in-game overlay's readings (Hud, HistogramSpan, SocTemp, Overlay): a fixed dark block in BOTH modes, its own status palette -->
+    <color name="bn_overlay_normal">#FFFFFFFF</color>   <!-- a value within range -->
+    <color name="bn_overlay_ok">#FF4CAF50</color>       <!-- the throttle dot / a level's green -->
+    <color name="bn_overlay_warn">#FFFFC107</color>     <!-- a value near the limit -->
+    <color name="bn_overlay_bad">#FFF44336</color>      <!-- a value over it, the SoC line's red -->
+    <color name="bn_overlay_off">#FF888888</color>      <!-- the dot when no reading is possible -->
+    <color name="bn_overlay_label_fps">#FF7FD4FF</color>    <!-- the FPS / THR / FT / 1%L label -->
+    <color name="bn_overlay_label_gpu">#FFA5E37A</color>    <!-- the GPU label -->
+    <color name="bn_overlay_label_cpu">#FF5FA8FF</color>    <!-- the CPU label -->
+    <color name="bn_overlay_label_soc">#FFFF9E5E</color>    <!-- the SOC / BAT label -->
+    <color name="bn_overlay_label_mem">#FFE58CFF</color>    <!-- the GAME / RAM label -->
+    <color name="bn_overlay_label_default">#FFB0B0B0</color> <!-- any other label -->
+
+    <!-- The game's own overlay scrims (GameActivity): black at increasing opacity, fixed in both modes -->
+    <color name="bn_scrim_medium">#80000000</color>  <!-- the overlay text's pill behind a reading -->
+    <color name="bn_scrim_strong">#99000000</color>  <!-- the "Paused" screen over the suspended game -->
+    <color name="bn_scrim_deep">#CC000000</color>    <!-- the skipped-work notice's pill -->
+    <color name="bn_prewarm_bg">#FF101714</color>    <!-- the shader-prewarm cover (GameActivity.prewarmPoll) -->
+
+    <!-- The on-screen controls (TouchControls): base colours, the alpha built in code as the whole overlay fades on the opacity setting. Not tinted, not themed -->
+    <color name="bn_touch_fill">#FF000000</color>    <!-- a control's fill -->
+    <color name="bn_touch_line">#FFFFFFFF</color>    <!-- a control's outline and label -->
+    <color name="bn_touch_accent">#FFFFD23C</color>  <!-- the layout editor's frames, highlight and Done button -->
+    <color name="bn_touch_shade">#FF282828</color>   <!-- the editor's unselected tool button -->
+    <color name="bn_touch_dim">#FF5A5A5A</color>     <!-- a stick's resting knob -->
 </resources>

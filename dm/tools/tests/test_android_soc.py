@@ -18,7 +18,7 @@ class Wiring(unittest.TestCase):
         self.assertIn('{"soc", "SoC temperature (hottest CPU / GPU zone)"}', t)
         self.assertIn('boolean soc = Prefs.overlayItem(ctx, "soc");', t)
         self.assertIn('&& !soc && ', t)
-        self.assertIn('if (soc) dev.peanuts.overlay.SocTemp.append(s);', t)
+        self.assertIn('if (soc) dev.peanuts.overlay.SocTemp.append(ctx, s);', t)
 
 
 @unittest.skipUnless(shutil.which('javac') and shutil.which('java'), 'no JDK')

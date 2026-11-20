@@ -21,6 +21,14 @@ public final class Tokens {
     // Type scale (sp): the five sizes every text is set in (section labels and tags, secondary text, body and buttons, headings, page titles)
     public static final float TYPE_CAPTION = 12, TYPE_SMALL = 13, TYPE_BODY = 15, TYPE_HEADING = 18, TYPE_TITLE = 24;
 
+    // The two named steps the fork's own cards need off the five above: a card's title above its value (TYPE_CARD_TITLE) and a cover's name / a short state line on
+    // the bottom screen (TYPE_LABEL). Named, so same-role text stays one size across Library, the build card, DriverActivity and the second screen instead of 14/16/17.
+    public static final float TYPE_CARD_TITLE = 17, TYPE_LABEL = 14;
+    // The launch screen's big name (TYPE_DISPLAY, TYPE_DISPLAY_SMALL on a narrow panel): larger than a page title on purpose (it is the game, full width)
+    public static final float TYPE_DISPLAY = 26, TYPE_DISPLAY_SMALL = 22;
+    // The companion development screen's brand line (CompanionPage text view): a watermark, its own size above a page title
+    public static final float TYPE_BRAND = 30;
+
     // Touch targets (dp): the smallest tappable area of a control (buttons and icon buttons size themselves to it, so a finger never misses and a
     // screen reader's cursor has something to land on)
     public static final int TOUCH_MIN = 48;
@@ -39,8 +47,14 @@ public final class Tokens {
     // The values off the grid the system still needs, each with its why:
     public static final int HAIRLINE_DP = 1;       // the hairline: card edges, dividers, the outline of a SOFT button, and the tightest gap (a row's value under its title)
     public static final int FOCUS_EDGE_DP = 2;     // the focus edge's width (Ui.style, Ui.touchable): a hairline reads as a card's edge, this reads as focus
+    public static final int FOCUS_RING_GAP_DP = 4; // the room a cover's focus ring needs on each side (Library.coverCell): the cell is the cover plus 2 x this
     public static final int OVERLAY_SP = 8;        // the in-game overlay's text (GameActivity): at 11-12 sp it covered the touch buttons games put in the corners
     public static final int PANEL_TAB_MIN_SP = 10; // the in-game panel's tab label's floor (SidePanel.tabTextSize): four labels share one bar the player can resize; below 12 sp only here
+    public static final int HEADER_CAPTION_SP = 10; // Home's header icon captions (Library.headerAction): three captions (FAQ, Settings, Screens off) share one 56 dp header row with the title; below 12 sp only here
+
+    // A page's readable maximum width (Ui.page(MainActivity, frame, maxWidthDp)): the same cap the cover grid derives its cell from, and Library.render's column maths
+    public static final int PAGE_MAX_DP = 900;      // every page but a game's settings
+    public static final int PAGE_MAX_WIDE_DP = 1040; // a game's settings page on a wide window, for its side rail
 
     // The status-bar scrim's alpha: the page's background color held at this alpha over the clock (Ui.page), so scrolled cards never show through
     public static final int SCRIM_ALPHA = 0xEE;

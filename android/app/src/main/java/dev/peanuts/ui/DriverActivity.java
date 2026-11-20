@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,6 +21,7 @@ import android.widget.TextView;
 
 import dev.nxnative.android.BananaBackgroundView;
 import dev.nxnative.android.R;
+import dev.nxnative.android.Tokens;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -123,7 +123,7 @@ public final class DriverActivity extends Activity {
         frame.setBackgroundColor(PUi.col(this, R.color.bn_bg));
         frame.addView(new BananaBackgroundView(this), new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         setContentView(frame);
-        content = PUi.page(this, frame, 760);
+        content = PUi.page(this, frame, Tokens.PAGE_MAX_DP);
         ((View) content.getParent()).setFocusable(false);   // past a long text the page scrolls on; as the focus itself it would grey out whole
         try {   // a controller: Settings' focus frame (PadFocus, package-private)
             java.lang.reflect.Method m = Class.forName("dev.nxnative.android.PadFocus").getDeclaredMethod("watch", android.view.Window.class);
@@ -396,7 +396,7 @@ public final class DriverActivity extends Activity {
             LinearLayout head = PUi.row(this);
             LinearLayout col = new LinearLayout(this);
             col.setOrientation(LinearLayout.VERTICAL);
-            col.addView(PUi.text(this, r.title, 17, R.color.bn_text, 700));
+            col.addView(PUi.text(this, r.title, Tokens.TYPE_CARD_TITLE, R.color.bn_text, 700));
             col.addView(PUi.small(this, when + ", " + r.assets.size() + " files."));
             head.addView(col, PUi.weight());
             if (toggle != null) head.addView(toggle);
@@ -415,7 +415,7 @@ public final class DriverActivity extends Activity {
         LinearLayout top = PUi.row(this);
         LinearLayout col = new LinearLayout(this);
         col.setOrientation(LinearLayout.VERTICAL);
-        col.addView(title != null ? PUi.text(this, title, 17, R.color.bn_text, 700) : PUi.text(this, a.name, 15, R.color.bn_text, 600));
+        col.addView(title != null ? PUi.text(this, title, Tokens.TYPE_CARD_TITLE, R.color.bn_text, 700) : PUi.text(this, a.name, Tokens.TYPE_BODY, R.color.bn_text, 600));
         String gpus = DriverMatch.words(a.gpus);
         boolean other = DriverMatch.otherGpu(a.gpus, phone);
         col.addView(PUi.small(this, (when != null ? when + ", " : "") + mb(a.size) + (gpus.isEmpty() ? "." : ", for " + gpus + ".")));
@@ -577,20 +577,20 @@ public final class DriverActivity extends Activity {
 
     private SharedPreferences prefs() { return getSharedPreferences("peanuts_drivers", MODE_PRIVATE); }
 
-    /** A list row: a title over a line or two; with l, the whole row is the target */
+    /** A list row: a title over a line or two; with l, the whole row is the target, with the same focus edge and metrics as a PUi.Setting row */
     private LinearLayout row(CharSequence title, CharSequence line, View.OnClickListener l) {
         LinearLayout r = PUi.row(this);
-        r.setPadding(PUi.dp(this, 12), PUi.dp(this, 10), PUi.dp(this, 12), PUi.dp(this, 10));
-        r.setMinimumHeight(PUi.dp(this, 60));
+        r.setPadding(PUi.dp(this, Tokens.SPACE_3), PUi.dp(this, Tokens.SPACE_2), PUi.dp(this, Tokens.SPACE_3), PUi.dp(this, Tokens.SPACE_2));
+        r.setMinimumHeight(PUi.dp(this, Tokens.ROW_DP));
         if (l != null) {
-            r.setBackground(PUi.ripple(this, PUi.round(Color.TRANSPARENT, PUi.dp(this, 14), 0, 0)));
+            PUi.tap(this, r, Tokens.RADIUS_ROW);   // the ripple and the hairline accent focus edge a Ui.Setting row shows, so a controller's focus reads here too (not only PadFocus's own frame)
             r.setOnClickListener(Haptics.on(Haptics.Word.TICK, l));
             r.setFocusable(true);
         }
         LinearLayout col = new LinearLayout(this);
         col.setOrientation(LinearLayout.VERTICAL);
-        col.setPadding(PUi.dp(this, 6), 0, PUi.dp(this, 8), 0);
-        col.addView(PUi.text(this, title, 16, R.color.bn_text, 600));
+        col.setPadding(PUi.dp(this, Tokens.SPACE_2), 0, PUi.dp(this, Tokens.SPACE_2), 0);
+        col.addView(PUi.text(this, title, Tokens.TYPE_BODY, R.color.bn_text, 600));
         if (line != null && line.length() > 0) col.addView(PUi.small(this, line));
         r.addView(col, PUi.weight());
         return r;
@@ -600,7 +600,7 @@ public final class DriverActivity extends Activity {
         android.widget.ImageView ch = new android.widget.ImageView(this);
         ch.setImageDrawable(PUi.icon(this, R.drawable.ic_chevron, R.color.bn_text_2));
         ch.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-        ch.setLayoutParams(new LinearLayout.LayoutParams(PUi.dp(this, 20), PUi.dp(this, 20)));
+        ch.setLayoutParams(new LinearLayout.LayoutParams(PUi.dp(this, Tokens.CHEVRON_DP), PUi.dp(this, Tokens.CHEVRON_DP)));
         return ch;
     }
 

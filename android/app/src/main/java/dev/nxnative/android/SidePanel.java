@@ -47,7 +47,8 @@ final class SidePanel extends FrameLayout {
     static final String[] TAB_NAMES = {"Performance", "Display", "Controls", "General"};
     private static final int TAB_PERF = 0, TAB_DISPLAY = 1, TAB_CONTROLS = 2, TAB_GENERAL = 3;
     private int tab = TAB_PERF;
-    private static final int FOCUS = 0xFFFFD54F;   // the tab bar's selected tab and the focus frame: a banana yellow, dark text on it
+    // The tab bar's selected tab and the focus frame are bn_panel_accent (the banana): dark text on it (bn_panel_on_pill). The panel keeps its dark look in both
+    // modes because it floats over the running game, so its colours are the bn_panel_* resources, read through act (not the launcher's bn_text/bn_card)
 
     // A controller: its confirm and back keys (padButtons), the held direction and its repeat
     private int confirm = KeyEvent.KEYCODE_BUTTON_B, back = KeyEvent.KEYCODE_BUTTON_A;
@@ -72,7 +73,7 @@ final class SidePanel extends FrameLayout {
         this.rows = rows;
         float dp = getResources().getDisplayMetrics().density;
         View scrim = new View(a);
-        scrim.setBackgroundColor(0x66000000);
+        scrim.setBackgroundColor(a.getColor(R.color.bn_panel_scrim));   // the panel's 40% scrim over the game
         scrim.setOnClickListener(v -> close());
         addView(scrim, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         box = new LinearLayout(a);
@@ -83,10 +84,10 @@ final class SidePanel extends FrameLayout {
         scroll.addView(box);
         LinearLayout sh = new LinearLayout(a);   // the tab bar fixed at the top, the tab's rows scrolling under it
         sh.setOrientation(LinearLayout.VERTICAL);
-        sh.setBackgroundColor(0xF0202124);
+        sh.setBackgroundColor(a.getColor(R.color.bn_panel_sheet));
         tabs = new LinearLayout(a);
         tabs.setOrientation(LinearLayout.HORIZONTAL);
-        tabs.setBackgroundColor(0xFF2D2E31);
+        tabs.setBackgroundColor(a.getColor(R.color.bn_panel_tabs));
         sh.addView(tabs, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         sh.addView(scroll, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
         addView(sh, new LayoutParams(PanelLook.widthPx(Prefs.panelSize(a), dp, a.getResources().getDisplayMetrics().widthPixels), LayoutParams.MATCH_PARENT, Gravity.END));
@@ -233,8 +234,8 @@ final class SidePanel extends FrameLayout {
         if (now == null || !inside(now) || isInTouchMode()) return;
         float dp = getResources().getDisplayMetrics().density;
         android.graphics.drawable.GradientDrawable d = new android.graphics.drawable.GradientDrawable();
-        d.setColor(0x26FFD54F);
-        d.setStroke(Math.round(2.5f * dp), FOCUS);
+        d.setColor(act.getColor(R.color.bn_panel_focus_rim));
+        d.setStroke(Math.round(2.5f * dp), act.getColor(R.color.bn_panel_accent));
         d.setCornerRadius(6 * dp);
         now.setForeground(d);
         lit = now;
@@ -274,8 +275,8 @@ final class SidePanel extends FrameLayout {
             t.setTextSize(TypedValue.COMPLEX_UNIT_SP, Tokens.TYPE_BODY);   // one size for every tab, set once the bar is laid out (tabTextSize)
             t.setPadding(pad, 0, pad, 0);
             t.setTypeface(on ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
-            t.setTextColor(on ? 0xFF000000 : 0xFFE8EAED);
-            t.setBackgroundColor(on ? FOCUS : 0);
+            t.setTextColor(on ? act.getColor(R.color.bn_panel_on_pill) : act.getColor(R.color.bn_panel_pill));
+            t.setBackgroundColor(on ? act.getColor(R.color.bn_panel_accent) : 0);
             t.setSelected(on);
             t.setFocusable(true);
             t.setOnClickListener(v -> showTab(k));
@@ -286,7 +287,7 @@ final class SidePanel extends FrameLayout {
         x.setText("✕");
         x.setGravity(Gravity.CENTER);
         x.setTextSize(Tokens.TYPE_HEADING);
-        x.setTextColor(0xFFE8EAED);
+        x.setTextColor(act.getColor(R.color.bn_panel_pill));
         x.setFocusable(true);
         x.setOnClickListener(v -> close());
         x.setContentDescription("Close the panel, back to the game");

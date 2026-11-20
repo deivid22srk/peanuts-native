@@ -604,7 +604,7 @@ final class Ui {
     static ProgressBar progress(Context c) {
         ProgressBar bar = new ProgressBar(c, null, android.R.attr.progressBarStyleHorizontal);
         bar.setProgressTintList(ColorStateList.valueOf(col(c, R.color.bn_accent)));   // the deep gold clears 3:1 against the track where the banana does not
-        bar.setProgressBackgroundTintList(ColorStateList.valueOf(col(c, R.color.bn_card_stroke)));
+        bar.setProgressBackgroundTintList(ColorStateList.valueOf(col(c, R.color.bn_track)));
         bar.setScaleY(1.6f);
         return bar;
     }

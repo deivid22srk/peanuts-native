@@ -7,10 +7,10 @@ import android.text.style.ReplacementSpan;
 
 /** PEANUTS: draws the frame-time histogram over its placeholder text (FrameStats.placeholder): one bar a char, as wide as {@code chars} monospace chars. */
 final class HistogramSpan extends ReplacementSpan {
-    private static final int[] COLORS = {0xFF4CAF50, 0xFFFFC107, 0xFFF44336};
     private final int chars;
+    private final int[] colors;   // the three levels' colours (Hud's bn_overlay_* resources resolved), index = FrameStats.levelOf
 
-    HistogramSpan(int chars) { this.chars = chars; }
+    HistogramSpan(int chars, int[] colors) { this.chars = chars; this.colors = colors; }
 
     private float width(Paint p) {
         Paint m = new Paint(p);
@@ -32,7 +32,7 @@ final class HistogramSpan extends ReplacementSpan {
         Paint p = new Paint(paint);
         for (int i = 0; i < n; i++) {
             char c = text.charAt(start + i);
-            p.setColor(COLORS[FrameStats.levelOf(c)]);
+            p.setColor(colors[FrameStats.levelOf(c)]);
             float bar = h * (FrameStats.bucketOf(c) + 1) / FrameStats.BUCKETS;
             canvas.drawRect(x + i * step, base - bar, x + (i + 1) * step - gap, base, p);
         }

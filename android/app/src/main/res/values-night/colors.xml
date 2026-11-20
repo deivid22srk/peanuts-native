@@ -3,7 +3,9 @@
 <resources>
     <color name="bn_bg">#FF17120C</color>            <!-- the screen (text on bg 16.6:1, secondary text on bg 9.3:1) -->
     <color name="bn_card">#FF241C14</color>          <!-- cards and dialogs (text on card 15.0:1, secondary text on card 8.4:1) -->
-    <color name="bn_card_stroke">#FF3A2E20</color>   <!-- hairline card edge, dividers, progress track -->
+    <color name="bn_card_stroke">#FF85683F</color>   <!-- hairline card edge, dividers: light enough to clear 3:1 on the page (3.6:1) and the card (3.2:1) -->
+    <color name="bn_track">#FF3A2E20</color>         <!-- a progress bar's track (Ui.progress, the cover's build strip): the banana fill clears 9:1 on it -->
+    <color name="bn_strip_track">#B3000000</color>   <!-- the building cover's progress strip behind the art (fill: bn_accent) -->
     <color name="bn_tint">#FF3A2D17</color>          <!-- tonal buttons, icon tiles, chips (text on tint 12.0:1, accent on tint 9.4:1) -->
     <color name="bn_banana">#FFFFD43B</color>        <!-- primary buttons (on_banana on banana 10.0:1) -->
     <color name="bn_banana_deep">#FFF2B705</color>   <!-- pressed primary accent, strong borders on warning surfaces -->
@@ -21,4 +23,54 @@
     <color name="bn_warn">#FFFFC85C</color>          <!-- warning text (10.9:1 on card, 8.3:1 on warn_tint) -->
     <color name="bn_ok_tint">#FF1C3325</color>       <!-- success container: the Readiness check's PASS rows (see values/colors.xml; ok text on it 6.8:1) -->
     <color name="bn_control_ripple">#33FFF1D2</color><!-- theme widget highlight/ripple (warm white at 20%) -->
+
+    <!-- The in-game panel's own set (same values in both modes; see values/colors.xml) -->
+    <color name="bn_panel_accent">#FFFFD43B</color>
+    <color name="bn_panel_on_pill">#FF000000</color>
+    <color name="bn_panel_pill">#FFE8EAED</color>
+    <color name="bn_panel_outline">#FF555555</color>
+    <color name="bn_panel_fill">#FF555555</color>
+    <color name="bn_panel_label">#FFC8C8C8</color>
+    <color name="bn_panel_note">#FF8A8A8A</color>
+    <color name="bn_panel_scrim">#66000000</color>
+    <color name="bn_panel_sheet">#F0202124</color>
+    <color name="bn_panel_tabs">#FF2D2E31</color>
+    <color name="bn_panel_focus_rim">#26FFD54F</color>
+    <color name="bn_panel_bg">#E0101418</color>
+    <color name="bn_panel_hint">#FFB8C4CC</color>
+    <color name="bn_panel_slot">#FF2E3A44</color>
+    <color name="bn_panel_slot_outline">#FF55626C</color>
+    <color name="bn_screens_off">#FF8A8A8A</color>
+
+    <!-- Black surfaces (same values in both modes; see values/colors.xml) -->
+    <color name="bn_scrim">#FF000000</color>
+    <color name="bn_black">#FF000000</color>
+    <color name="bn_dev_bg">#FF14120C</color>
+    <color name="bn_dev_title">#FFFFD95A</color>
+
+    <!-- The in-game overlay's readings (same values in both modes; see values/colors.xml) -->
+    <color name="bn_overlay_normal">#FFFFFFFF</color>
+    <color name="bn_overlay_ok">#FF4CAF50</color>
+    <color name="bn_overlay_warn">#FFFFC107</color>
+    <color name="bn_overlay_bad">#FFF44336</color>
+    <color name="bn_overlay_off">#FF888888</color>
+    <color name="bn_overlay_label_fps">#FF7FD4FF</color>
+    <color name="bn_overlay_label_gpu">#FFA5E37A</color>
+    <color name="bn_overlay_label_cpu">#FF5FA8FF</color>
+    <color name="bn_overlay_label_soc">#FFFF9E5E</color>
+    <color name="bn_overlay_label_mem">#FFE58CFF</color>
+    <color name="bn_overlay_label_default">#FFB0B0B0</color>
+
+    <!-- The game's own overlay scrims (same values in both modes; see values/colors.xml) -->
+    <color name="bn_scrim_medium">#80000000</color>
+    <color name="bn_scrim_strong">#99000000</color>
+    <color name="bn_scrim_deep">#CC000000</color>
+    <color name="bn_prewarm_bg">#FF101714</color>
+
+    <!-- The on-screen controls' base colours (same values in both modes; see values/colors.xml) -->
+    <color name="bn_touch_fill">#FF000000</color>
+    <color name="bn_touch_line">#FFFFFFFF</color>
+    <color name="bn_touch_accent">#FFFFD23C</color>
+    <color name="bn_touch_shade">#FF282828</color>
+    <color name="bn_touch_dim">#FF5A5A5A</color>
 </resources>

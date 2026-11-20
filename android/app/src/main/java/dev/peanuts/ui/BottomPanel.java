@@ -34,6 +34,7 @@ import java.util.Locale;
 import dev.nxnative.android.BananaBackgroundView;
 import dev.nxnative.android.BuildConfig;
 import dev.nxnative.android.R;
+import dev.nxnative.android.Tokens;
 
 /**
  * The bottom screen's window: logo, game card, build and start pages, built once and updated in place.
@@ -95,7 +96,7 @@ final class BottomPanel extends Presentation {
         stage = new FrameLayout(c);
         root.addView(stage, fill());
         scrim = new View(c);
-        scrim.setBackgroundColor(0xFF000000);
+        scrim.setBackgroundColor(PUi.col(c, R.color.bn_scrim));
         scrim.setClickable(true);   // swallows taps while dimmed
         scrim.setAlpha(dimmed ? DIM : 0f);
         scrim.setVisibility(dimmed ? View.VISIBLE : View.GONE);
@@ -220,7 +221,7 @@ final class BottomPanel extends Presentation {
         PUi.add(col, t, 16, PUi.wrap());
         String id = BuildConfig.NX_PEANUTS_ID;
         if (id != null && !id.isEmpty()) {
-            TextView v = PUi.text(c, id, 13, R.color.bn_text_2, 600);
+            TextView v = PUi.text(c, id, Tokens.TYPE_SMALL, R.color.bn_text_2, 600);
             v.setGravity(Gravity.CENTER);
             PUi.add(col, v, 4, PUi.wrap());
         }
@@ -237,13 +238,13 @@ final class BottomPanel extends Presentation {
         top.addView(cardTile);
         LinearLayout info = column(c);
         info.setPadding(PUi.dp(c, 16), 0, 0, 0);
-        cardName = PUi.text(c, "", wide ? 26 : 22, R.color.bn_text, 800);
+        cardName = PUi.text(c, "", wide ? Tokens.TYPE_DISPLAY : Tokens.TYPE_DISPLAY_SMALL, R.color.bn_text, 800);
         cardName.setMaxLines(wide ? 3 : 2);
         cardName.setEllipsize(TextUtils.TruncateAt.END);
         info.addView(cardName);
         cardMark = PUi.row(c);
         PUi.add(info, cardMark, 8);
-        cardState = PUi.text(c, "", 14, R.color.bn_text, 600);
+        cardState = PUi.text(c, "", Tokens.TYPE_LABEL, R.color.bn_text, 600);
         cardLine1Row = PUi.row(c);
         cardBadge = companionBadge(c);
         cardLine1Row.addView(cardBadge);
@@ -280,11 +281,11 @@ final class BottomPanel extends Presentation {
         top.addView(buildTile);
         LinearLayout info = column(c);
         info.setPadding(PUi.dp(c, 14), 0, 0, 0);
-        buildName = PUi.text(c, "", 17, R.color.bn_text, 700);
+        buildName = PUi.text(c, "", Tokens.TYPE_CARD_TITLE, R.color.bn_text, 700);
         buildName.setMaxLines(2);
         buildName.setEllipsize(TextUtils.TruncateAt.END);
         info.addView(buildName);
-        buildStatus = PUi.text(c, "", 13, R.color.bn_accent, 600);
+        buildStatus = PUi.text(c, "", Tokens.TYPE_SMALL, R.color.bn_accent, 600);
         PUi.add(info, buildStatus, 2);
         top.addView(info, PUi.weight());
         card.addView(top);
@@ -309,7 +310,7 @@ final class BottomPanel extends Presentation {
         PUi.Action b = PUi.action(c, 0, label, PUi.Kind.TONAL, l);
         b.setMinimumHeight(PUi.dp(c, 48));
         b.setBackground(PUi.ripple(c, PUi.round(PUi.col(c, R.color.bn_tint), PUi.dp(c, 14), 0, 0)));
-        b.label.setTextSize(15);
+        b.label.setTextSize(Tokens.TYPE_BODY);
         b.label.setTypeface(PUi.face(600));
         setKey(b, key);
         return b;

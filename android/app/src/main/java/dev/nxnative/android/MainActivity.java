@@ -195,7 +195,7 @@ public final class MainActivity extends Activity {
         FrameLayout frame = (FrameLayout) bananas.getParent();
         while (frame.getChildCount() > 1) frame.removeViewAt(1);
         boolean wide = getResources().getConfiguration().screenWidthDp >= 600;
-        LinearLayout content = Ui.page(this, frame, settingsGame != null && !advancedOpen && wide ? 1040 : 900);   // PEANUTS: four covers per row on a handheld (upstream: 640)
+        LinearLayout content = Ui.page(this, frame, settingsGame != null && !advancedOpen && wide ? Tokens.PAGE_MAX_WIDE_DP : Tokens.PAGE_MAX_DP);   // PEANUTS: four covers per row on a handheld (upstream: 640)
         poppedText = null;
         if (settingsGame != null) for (Game x : Game.load(this)) if (x.gameDir.equals(settingsGame.gameDir)) { settingsGame = x; break; }   // its folders as they are now (Folders, Import pack)
         if (advancedOpen) { accessCard = null; gameBox = null; overlayRow = null; AdvancedPage.build(this, content, advancedTitleId, advancedName, this::closeAdvanced); }
@@ -613,28 +613,7 @@ public final class MainActivity extends Activity {
             new Thread(() -> { if (Game.collapse(this)) runOnUiThread(() -> { if (!isFinishing()) refresh(); }); }, "nx-list-merge").start();
         }
         gameBox.removeAllViews();
-        dev.peanuts.ui.Library.fill(this, gameBox, games, Ondevice.cardView(), Ondevice::shows, this::gameCard, this::manage, this::refresh);   // PEANUTS: the library is Home's game list (the cover grid, the Building filter with the build card and the progress card)
-    }
-
-    /** No game yet: the shared empty state (Ui.emptyState: the banana, the heading, the sentence) with the three steps and the Add game action */
-    private View emptyCard() {
-        LinearLayout steps = Ui.row(this);
-        steps.setGravity(Gravity.CENTER);
-        String[] s = {"1  Pick dump", "2  Prepare", "3  Play"};
-        for (int k = 0; k < s.length; k++) {
-            LinearLayout.LayoutParams lp = Ui.wrap();
-            if (k > 0) lp.leftMargin = dp(Tokens.SPACE_2);
-            TextView chip = Ui.chip(this, s[k]);
-            chip.setSingleLine(true);
-            steps.addView(chip, lp);
-        }
-        LinearLayout empty = Ui.emptyState(this, "Add your game",
-                "Pick your dump folder, the one with base/ (and updates/), or your game's .nup or .nsp file.",
-                Ui.action(this, R.drawable.ic_add, "Add game", Ui.Kind.PRIMARY, v -> addGame()));
-        LinearLayout.LayoutParams stepsGap = Ui.wrap();
-        stepsGap.topMargin = dp(Tokens.SPACE_4);   // a raw insert brings no gap (Ui.emptyState's add(…) gives its own children one): keep the body clear of the chips
-        empty.addView(steps, 3, stepsGap);   // the steps between the body and the action (Ui.emptyState: icon, heading, body, action)
-        return empty;
+        dev.peanuts.ui.Library.fill(this, gameBox, games, Ondevice.cardView(), Ondevice::shows, this::gameCard, this::addGame, this::manage, this::refresh);   // PEANUTS: the library is Home's game list (the cover grid, the Building filter with the build card and the progress card; addGame is the empty library's action)
     }
 
     /**

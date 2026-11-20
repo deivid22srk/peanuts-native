@@ -20,6 +20,7 @@ import android.widget.TextView;
 import java.util.Locale;
 
 import dev.nxnative.android.R;
+import dev.nxnative.android.Tokens;
 
 /**
  * A game on its way: its cover in a breathing ring, name, step and a gliding light.
@@ -52,7 +53,7 @@ public final class StartView extends FrameLayout implements Choreographer.FrameC
         FrameLayout art = new FrameLayout(c);
         art.setClipChildren(false);
         ring = new View(c);
-        ring.setBackground(PUi.round(Color.TRANSPARENT, PUi.dp(c, 16) + gap, PUi.col(c, R.color.bn_banana), PUi.dp(c, 2)));
+        ring.setBackground(PUi.round(Color.TRANSPARENT, PUi.dp(c, Tokens.RADIUS_INNER) + gap, PUi.col(c, R.color.bn_accent), PUi.dp(c, 2)));
         ring.setAlpha(0f);
         art.addView(ring, new FrameLayout.LayoutParams(PUi.dp(c, size) + 2 * gap, PUi.dp(c, size) + 2 * gap, Gravity.CENTER));
         tile = PUi.tile(c, "?", size);
@@ -61,12 +62,12 @@ public final class StartView extends FrameLayout implements Choreographer.FrameC
         info = new LinearLayout(c);
         info.setOrientation(LinearLayout.VERTICAL);
         info.setGravity(Gravity.CENTER_HORIZONTAL);
-        name = PUi.text(c, "", wide ? 26 : 22, R.color.bn_text, 800);
+        name = PUi.text(c, "", wide ? Tokens.TYPE_DISPLAY : Tokens.TYPE_DISPLAY_SMALL, R.color.bn_text, 800);
         name.setGravity(Gravity.CENTER);
         name.setMaxLines(2);
         name.setEllipsize(TextUtils.TruncateAt.END);
         info.addView(name, PUi.wrap());
-        status = PUi.text(c, "", 14, R.color.bn_text_2, 600);
+        status = PUi.text(c, "", Tokens.TYPE_LABEL, R.color.bn_text_2, 600);
         status.setGravity(Gravity.CENTER);
         status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         PUi.add(info, status, 6, PUi.wrap());
@@ -137,7 +138,7 @@ public final class StartView extends FrameLayout implements Choreographer.FrameC
         Sweep(Context c) {
             super(c);
             track.setColor(PUi.col(c, R.color.bn_tint));
-            light.setColor(PUi.col(c, R.color.bn_banana));
+            light.setColor(PUi.col(c, R.color.bn_accent));   // the deep gold, like the focus ring: the banana read 1.3:1 on the cream (below 3:1 for an indicator)
             setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
         }
 

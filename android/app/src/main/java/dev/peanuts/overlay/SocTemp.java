@@ -1,9 +1,12 @@
 package dev.peanuts.overlay;
 
+import android.content.Context;
 import android.os.SystemClock;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+
+import dev.nxnative.android.R;
 
 import java.io.File;
 import java.util.List;
@@ -18,7 +21,6 @@ public final class SocTemp {
     private SocTemp() {}
 
     static final int HOT = 80;                    // °C: the line turns red
-    private static final int RED = 0xFFF44336;    // Overlay's red dot
     private static ExecutorService thread;
     private static volatile List<File> zones;     // found once, on the thread
     private static volatile int last = SocZones.NONE;
@@ -26,7 +28,7 @@ public final class SocTemp {
     private static volatile boolean busy;
 
     /** Adds the line to the overlay's text ("SoC 52°C", red from HOT; "SoC ?" when no zone reads; nothing before the first reading) and asks for the next one */
-    public static void append(SpannableStringBuilder s) {
+    public static void append(Context ctx, SpannableStringBuilder s) {
         ask();
         if (zones == null) return;
         int c = last;
@@ -34,7 +36,7 @@ public final class SocTemp {
         if (c == SocZones.NONE) { s.append("SoC ?"); return; }
         int start = s.length();
         s.append("SoC ").append(String.valueOf(c)).append("°C");
-        if (c >= HOT) s.setSpan(new ForegroundColorSpan(RED), start, s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if (c >= HOT) s.setSpan(new ForegroundColorSpan(ctx.getColor(R.color.bn_overlay_bad)), start, s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     /** The last reading in °C (SocZones.NONE when there is none yet or no zone reads); asks for the next one */

@@ -27,6 +27,8 @@ import dev.peanuts.mods.ModImportUi;
 import dev.peanuts.mods.ModRuntime;
 import dev.peanuts.mods.ModStore;
 import dev.peanuts.ui.LibrarySettings;
+import dev.peanuts.ui.PUi;
+import dev.nxnative.android.Tokens;
 
 /**
  * The Mods section of a game's settings page (GameSettings.build, the Game tab, above Companion; HOOKS.md): one row per installed mod with what it carries
@@ -266,7 +268,12 @@ public final class ModsSection {
         if (importTitle == null && SWEPT.add("the app's cache")) ModImportUi.sweepStaging(a);
         if (mods.isEmpty() && !importing) body.addView(ui.setting("🧩", "No mods installed", "Files, cheats and code mods from this device", null), SectionUi.lp(0, 0));
         for (ModStore.Mod m : mods) body.addView(modRow(m, !importing), SectionUi.lp(0, 0));
-        if (titleId.equals(importTitle)) body.addView(ui.setting("📥", "Installing a mod", importText, null), SectionUi.lp(0, 0));
+        if (titleId.equals(importTitle)) {
+            body.addView(ui.setting("📥", "Installing a mod", importText, null), SectionUi.lp(0, 0));
+            android.widget.ProgressBar bar = PUi.progress(a);   // the install reads and writes GBs: an indeterminate bar, as the rest of the app shows for a long wait
+            bar.setIndeterminate(true);
+            body.addView(bar, SectionUi.lp(0, 4));
+        }
         if (deleting) body.addView(ui.setting("🗑", "Deleting " + deleteName, deleteText + " Install, the switches and Build with mods wait for it.", null), SectionUi.lp(0, 0));
         if (ModStore.needsBuild(mods)) buildRows(mods);
         LinearLayout buttons = SectionUi.buttons(a);
@@ -281,15 +288,16 @@ public final class ModsSection {
         if (row instanceof LinearLayout) {
             TextView bin = new TextView(a);
             bin.setText("🗑");
-            bin.setTextSize(dev.nxnative.android.Tokens.TYPE_BODY);   // the body stop, by token (this package reaches upstream classes by name, as AppStorage above)
+            bin.setTextSize(Tokens.TYPE_BODY);   // the body stop, by token (this package reaches upstream classes by name, as AppStorage above)
             bin.setGravity(Gravity.CENTER);
             bin.setContentDescription("Delete " + m.name);
             bin.setFocusable(true);
             bin.setEnabled(enabled);
             bin.setAlpha(enabled ? 1f : 0.4f);
             bin.setOnClickListener(dev.peanuts.ui.Feel.row(v -> confirmDelete(m)));   // it opens the question: a tick, as a row that opens something
-            LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(SectionUi.dp(44), SectionUi.dp(44));
-            p.leftMargin = SectionUi.dp(4);
+            PUi.tap(a, bin, Tokens.RADIUS_SM);   // the same ripple and hairline accent focus edge a Ui.Setting row shows
+            LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(SectionUi.dp(Tokens.TOUCH_MIN), SectionUi.dp(Tokens.TOUCH_MIN));   // a full 48 dp touch target (was 44)
+            p.leftMargin = SectionUi.dp(Tokens.SPACE_1);
             ((LinearLayout) row).addView(bin, p);
         }
         return row;

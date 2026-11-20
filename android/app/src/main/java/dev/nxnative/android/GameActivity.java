@@ -176,7 +176,7 @@ public final class GameActivity extends Activity implements SurfaceHolder.Callba
         pausedView.setTextColor(Color.WHITE);
         pausedView.setTextSize(Tokens.TYPE_TITLE);
         pausedView.setGravity(Gravity.CENTER);
-        pausedView.setBackgroundColor(0x99000000);
+        pausedView.setBackgroundColor(getColor(R.color.bn_scrim_strong));
         pausedView.setVisibility(View.GONE);
         pausedView.setOnClickListener(v -> unpause());
         root.addView(pausedView, root.indexOfChild(handle), new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
@@ -215,7 +215,7 @@ public final class GameActivity extends Activity implements SurfaceHolder.Callba
         t.setAlpha(alpha);
         t.setPadding(Math.round(3 * dp), Math.round(1 * dp), Math.round(3 * dp), Math.round(1 * dp));
         android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
-        bg.setColor(0x80000000);
+        bg.setColor(getColor(R.color.bn_scrim_medium));
         bg.setCornerRadius(3 * dp);
         t.setBackground(bg);
         t.setClickable(false);
@@ -273,7 +273,7 @@ public final class GameActivity extends Activity implements SurfaceHolder.Callba
                 prewarmCover = new LinearLayout(this);
                 prewarmCover.setOrientation(LinearLayout.VERTICAL);
                 prewarmCover.setGravity(Gravity.CENTER);
-                prewarmCover.setBackgroundColor(0xff101714);
+                prewarmCover.setBackgroundColor(getColor(R.color.bn_prewarm_bg));
                 prewarmCover.setClickable(true);
                 prewarmText = new TextView(this);
                 prewarmText.setTextColor(Color.WHITE);
@@ -338,7 +338,7 @@ public final class GameActivity extends Activity implements SurfaceHolder.Callba
         int p = Math.round(10 * dp);
         h.setPadding(p, p, p, p);
         android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
-        bg.setColor(0xCC000000);
+        bg.setColor(getColor(R.color.bn_scrim_deep));
         bg.setCornerRadius(10 * dp);
         h.setBackground(bg);
         h.setMaxWidth(Math.round(460 * dp));
@@ -1282,7 +1282,7 @@ public final class GameActivity extends Activity implements SurfaceHolder.Callba
         int p = Math.round(10 * dp);
         h.setPadding(p, p, p, p);
         android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
-        bg.setColor(0xCC000000);
+        bg.setColor(getColor(R.color.bn_scrim_deep));
         bg.setCornerRadius(10 * dp);
         h.setBackground(bg);
         h.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);

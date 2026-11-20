@@ -11,6 +11,8 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import dev.nxnative.android.R;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -97,7 +99,7 @@ public final class HudSettings {
         int pv = Math.round(10 * dp);
         row.setPadding(0, pv, 0, pv);
         // the title's colour and size are the master switch's, found at runtime, so the rows read as active like the switches above them
-        int textColor = 0xFFFFFFFF;
+        int textColor = c.getColor(R.color.bn_overlay_normal);
         float textPx = 14 * dp;
         for (int i = 0; i < box.getChildCount(); i++) {
             View v = box.getChildAt(i);
@@ -121,7 +123,7 @@ public final class HudSettings {
         row.addView(val, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         Runnable show = () -> {
             int i = Math.max(0, Arrays.asList(values).indexOf(cur.get()));
-            val.setTextColor(0xFFFFD54F);   // the panel's accent (SidePanel.FOCUS), full opacity
+            val.setTextColor(c.getColor(R.color.bn_panel_accent));   // the panel's accent (bn_panel_accent, the banana itself), full opacity
             val.setText(names[i] + " \u203A");
         };
         show.run();

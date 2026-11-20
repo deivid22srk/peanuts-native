@@ -154,7 +154,13 @@ public final class CompanionVersions {
 
     private void render() {
         box.removeAllViews();
-        if (loading) { PUi.add(box, PUi.body(act, "Loading versions…"), 0); return; }
+        if (loading) {
+            PUi.add(box, PUi.body(act, "Loading versions…"), 0);
+            android.widget.ProgressBar bar = PUi.progress(act);   // the catalog read is a network wait: an indeterminate bar, as the driver page shows
+            bar.setIndeterminate(true);
+            PUi.add(box, bar, 10);
+            return;
+        }
         if (loadError != null && versions.isEmpty()) { PUi.add(box, PUi.body(act, "Catalog unavailable: " + loadError), 0); return; }
         if (root == null) { PUi.add(box, PUi.body(act, "Build the game first: a companion goes beside its pack, so there is nowhere to install one yet."), 0); return; }
         if (versions.isEmpty()) { PUi.add(box, PUi.body(act, "No companion in the catalog for this game."), 0); return; }
@@ -225,22 +231,36 @@ public final class CompanionVersions {
         LinearLayout facts = PUi.add(page, new LinearLayout(act), 14);
         facts.setOrientation(LinearLayout.VERTICAL);
         facts.setPadding(PUi.dp(act, 4), 0, PUi.dp(act, 4), 0);
+        List<String[]> rows = new ArrayList<>();
         String game = CompanionNotes.gameVersion(item.notes);
-        if (!game.isEmpty()) fact(facts, "Game version", game);
-        if (!item.date.isEmpty()) fact(facts, "Released", day(item.date, "d MMMM yyyy"));
-        fact(facts, "Size", size(item.size));
-        fact(facts, "Checksum", isActive ? (activeVerified ? "Verified" : "Not verified, an older version of this app installed it")
-                : installable ? "Checked before it installs" : "None published, so it cannot be installed");
+        if (!game.isEmpty()) rows.add(new String[] {"Game version", game});
+        if (!item.date.isEmpty()) rows.add(new String[] {"Released", day(item.date, "d MMMM yyyy")});
+        rows.add(new String[] {"Size", size(item.size)});
+        rows.add(new String[] {"Checksum", isActive ? (activeVerified ? "Verified" : "Not verified, an older version of this app installed it")
+                : installable ? "Checked before it installs" : "None published, so it cannot be installed"});
+        facts(facts, rows);
         AlertDialog.Builder b = PUi.sheet(act, "Version " + item.version, page).setNegativeButton("Close", null);
         if (!isActive && installable && !busy) b.setPositiveButton(label(item), (d, w) -> install(item, isLocal));
         b.show();
     }
 
-    /** A detail under the notes: its name, and the detail beside it, both small */
-    private void fact(LinearLayout box, String name, String value) {
+    /** The details under the notes: a name column as wide as its widest label (measured, so a large font scale or a narrow screen wraps the value instead of the old fixed 120 dp), the value beside it */
+    private void facts(LinearLayout box, List<String[]> rows) {
+        int width = 0;
+        for (String[] f : rows) {
+            android.widget.TextView m = PUi.small(act, f[0]);
+            m.measure(android.view.View.MeasureSpec.makeMeasureSpec(0, android.view.View.MeasureSpec.UNSPECIFIED),
+                    android.view.View.MeasureSpec.makeMeasureSpec(0, android.view.View.MeasureSpec.UNSPECIFIED));
+            width = Math.max(width, m.getMeasuredWidth());
+        }
+        for (String[] f : rows) fact(box, f[0], f[1], width);
+    }
+
+    /** A detail under the notes: its name, and the detail beside it, both small; widthPx: the shared name column */
+    private void fact(LinearLayout box, String name, String value, int widthPx) {
         LinearLayout r = PUi.row(act);
         r.setGravity(android.view.Gravity.TOP);
-        r.addView(PUi.small(act, name), new LinearLayout.LayoutParams(PUi.dp(act, 120), LinearLayout.LayoutParams.WRAP_CONTENT));
+        r.addView(PUi.small(act, name), new LinearLayout.LayoutParams(widthPx, LinearLayout.LayoutParams.WRAP_CONTENT));
         android.widget.TextView v = PUi.small(act, value);
         v.setTextColor(PUi.col(act, dev.nxnative.android.R.color.bn_text));
         r.addView(v, PUi.weight());

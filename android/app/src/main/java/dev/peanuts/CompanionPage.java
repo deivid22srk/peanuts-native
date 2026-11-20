@@ -23,6 +23,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import dev.nxnative.android.R;
+import dev.nxnative.android.Tokens;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Map;
@@ -72,7 +75,7 @@ final class CompanionPage {
             getContext().getContentResolver().registerContentObserver(android.provider.Settings.System.getUriFor(android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE), false, brightnessObserver);
         } catch (RuntimeException e) { android.util.Log.w("peanuts", "companion: cannot watch brightness: " + e); }
         FrameLayout root = new FrameLayout(getContext());
-        root.setBackgroundColor(Color.BLACK);
+        root.setBackgroundColor(getContext().getColor(R.color.bn_black));
         page = new ImageView(getContext());
         page.setScaleType(ImageView.ScaleType.FIT_CENTER);
         page.setVisibility(View.GONE);
@@ -84,10 +87,10 @@ final class CompanionPage {
         textRoot.setOrientation(LinearLayout.VERTICAL);
         textRoot.setGravity(Gravity.CENTER_HORIZONTAL);
         textRoot.setPadding(32, 48, 32, 32);
-        textRoot.setBackgroundColor(Color.rgb(0x14, 0x12, 0x0c));
-        textRoot.addView(text("Peanuts Native", 30, Color.rgb(0xff, 0xd9, 0x5a), Typeface.DEFAULT_BOLD));
-        textRoot.addView(text(gameName, 22, Color.WHITE, Typeface.DEFAULT));
-        values = text("", 18, Color.LTGRAY, Typeface.MONOSPACE);
+        textRoot.setBackgroundColor(getContext().getColor(R.color.bn_dev_bg));
+        textRoot.addView(text("Peanuts Native", (int) Tokens.TYPE_BRAND, getContext().getColor(R.color.bn_dev_title), Typeface.DEFAULT_BOLD));
+        textRoot.addView(text(gameName, (int) Tokens.TYPE_DISPLAY_SMALL, Color.WHITE, Typeface.DEFAULT));
+        values = text("", (int) Tokens.TYPE_HEADING, Color.LTGRAY, Typeface.MONOSPACE);
         values.setGravity(Gravity.START);
         textRoot.addView(values);
         root.addView(textRoot, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));

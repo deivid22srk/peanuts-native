@@ -1,5 +1,6 @@
 package dev.peanuts.ui;
 
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -16,6 +17,9 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import dev.nxnative.android.R;
+import dev.nxnative.android.Tokens;
+
 /**
  * PEANUTS: a restyle of the in-game side panel's tabs, called from SidePanel.look() after a tab is built. It only changes looks, never behaviour and never removes a
  * view: short radio groups become segmented controls, the section headings (SidePanel.head: bold, 15 sp, an 18 dp top gap, no side padding) and the grey notes
@@ -26,14 +30,11 @@ public final class PanelPolish {
     private PanelPolish() {}
 
     private static final String DONE = "pn_polish";
-    // The panel's own colours, named like SidePanel names FOCUS: the panel is the in-game overlay and keeps its dark look (SidePanel's tabs, headings and notes use
-    // the same greys) — the banana palette is the launcher's, and bn_text/bn_card would disagree with the panel around these pills. Focus is the panel's own
-    // frame: SidePanel.focusMoved draws SidePanel.FOCUS on the focused view's foreground (any view inside the sheet, these pills included), so the pills'
-    // StateListDrawable deliberately carries no focused state — one indicator, the same convention as Ui.style's views being skipped by PadFocus.watch
-    private static final int ACCENT = 0xFFFFD54F;   // SidePanel.FOCUS, the selected tab's colour
-    private static final int OUTLINE = 0xFF555555;
-    private static final int ON_PILL = 0xFF000000;  // the dark label on the selected pill (dark text on the panel's yellow, as on SidePanel's selected tab)
-    private static final int OFF_PILL = 0xFFE8EAED; // the panel's own label grey (SidePanel's unselected tab label)
+    // The panel's own colours now come from the palette tokens (bn_panel_*): the panel is the in-game overlay and keeps its dark look (SidePanel's tabs, headings and
+    // notes use the same greys) — the banana palette is the launcher's, and bn_text/bn_card would disagree with the panel around these pills. The accent is the banana
+    // itself (bn_panel_accent), never a second #FFD54F. Focus is the panel's own frame: SidePanel.focusMoved draws SidePanel.FOCUS on the focused view's foreground
+    // (any view inside the sheet, these pills included), so the pills' StateListDrawable deliberately carries no focused state — one indicator, the same convention as
+    // Ui.style's views being skipped by PadFocus.watch
 
     public static void apply(View root) {
         if (root == null) return;
@@ -53,11 +54,12 @@ public final class PanelPolish {
     }
 
     private static void segmented(RadioGroup g, float dp) {
+        Context c = g.getContext();
         int n = g.getChildCount();
         if (n < 1 || n > 4) return;
         for (int i = 0; i < n; i++) {
-            View c = g.getChildAt(i);
-            if (!(c instanceof RadioButton) || String.valueOf(((RadioButton) c).getText()).length() > 12) return;
+            View c0 = g.getChildAt(i);
+            if (!(c0 instanceof RadioButton) || String.valueOf(((RadioButton) c0).getText()).length() > 12) return;
         }
         g.setOrientation(LinearLayout.HORIZONTAL);
         g.setTag(DONE);
@@ -67,10 +69,10 @@ public final class PanelPolish {
             b.setGravity(Gravity.CENTER);
             b.setSingleLine(true);
             b.setPadding(Math.round(6 * dp), 0, Math.round(6 * dp), 0);
-            b.setTextColor(new ColorStateList(new int[][] {{android.R.attr.state_checked}, {}}, new int[] {ON_PILL, OFF_PILL}));   // no focused state here: SidePanel.focusMoved's yellow frame already marks the focused pill (see the constants above)
+            b.setTextColor(new ColorStateList(new int[][] {{android.R.attr.state_checked}, {}}, new int[] {c.getColor(R.color.bn_panel_on_pill), c.getColor(R.color.bn_panel_pill)}));   // no focused state here: SidePanel.focusMoved's yellow frame already marks the focused pill (see the constants above)
             StateListDrawable bg = new StateListDrawable();
-            bg.addState(new int[] {android.R.attr.state_checked}, pill(ACCENT, 0, dp));
-            bg.addState(new int[] {}, pill(Color.TRANSPARENT, OUTLINE, dp));
+            bg.addState(new int[] {android.R.attr.state_checked}, pill(c.getColor(R.color.bn_panel_accent), 0, dp));
+            bg.addState(new int[] {}, pill(Color.TRANSPARENT, c.getColor(R.color.bn_panel_outline), dp));
             b.setBackground(bg);
             RadioGroup.LayoutParams lp = new RadioGroup.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
             lp.setMargins(i == 0 ? 0 : Math.round(3 * dp), Math.round(2 * dp), i == n - 1 ? 0 : Math.round(3 * dp), Math.round(2 * dp));
@@ -81,7 +83,7 @@ public final class PanelPolish {
     private static GradientDrawable pill(int fill, int stroke, float dp) {
         GradientDrawable d = new GradientDrawable();
         d.setColor(fill);
-        d.setCornerRadius(8 * dp);
+        d.setCornerRadius(Tokens.RADIUS_SM * dp);
         if (stroke != 0) d.setStroke(Math.round(dp), stroke);
         return d;
     }
@@ -98,13 +100,13 @@ public final class PanelPolish {
             t.setTag(DONE);
             t.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
             t.setTextSize(TypedValue.COMPLEX_UNIT_PX, 13 * sp * scale);
-            t.setTextColor(0xFFC8C8C8);
+            t.setTextColor(t.getContext().getColor(R.color.bn_panel_label));
             t.setPadding(0, Math.round(20 * dp), 0, 0);
         } else if (!bold && t.getCurrentTextColor() == Color.LTGRAY && size <= 13 * sp) {
             float scale = size / (12 * sp);
             t.setTag(DONE);
             t.setTextSize(TypedValue.COMPLEX_UNIT_PX, 12 * sp * scale);
-            t.setTextColor(0xFF8A8A8A);
+            t.setTextColor(t.getContext().getColor(R.color.bn_panel_note));
             t.setLineSpacing(0, 1.15f);
         }
     }
@@ -126,7 +128,7 @@ public final class PanelPolish {
     private static void button(Button b, float dp) {
         if (!b.isAllCaps()) return;   // the panel's list rows (SidePanel.row) already turned it off
         TypedValue tv = new TypedValue();
-        int fill = b.getContext().getTheme().resolveAttribute(android.R.attr.colorButtonNormal, tv, true) ? tv.data : 0xFF555555;
+        int fill = b.getContext().getTheme().resolveAttribute(android.R.attr.colorButtonNormal, tv, true) ? tv.data : b.getContext().getColor(R.color.bn_panel_fill);
         b.setTag(DONE);
         b.setAllCaps(false);
         b.setStateListAnimator(null);

@@ -48,13 +48,6 @@ public final class FrameStatsJvmTest {
         char c = p1.charAt(47);
         check(FrameStats.levelOf(c) == 2 && FrameStats.bucketOf(c) == 7, "decode red top bar");
         check(FrameStats.levelOf(p1.charAt(0)) == 0, "decode green");
-        check(FrameStats.labelColor("FPS") == 0xFF7FD4FF && FrameStats.labelColor("THR") == 0xFF7FD4FF && FrameStats.labelColor("FT") == 0xFF7FD4FF
-                && FrameStats.labelColor("1%L") == 0xFF7FD4FF, "label colour: FPS group");
-        check(FrameStats.labelColor("GPU") == 0xFFA5E37A, "label colour: GPU");
-        check(FrameStats.labelColor("CPU") == 0xFF5FA8FF, "label colour: CPU");
-        check(FrameStats.labelColor("SOC") == 0xFFFF9E5E && FrameStats.labelColor("BAT") == 0xFFFF9E5E, "label colour: SOC and BAT");
-        check(FrameStats.labelColor("GAME") == 0xFFE58CFF && FrameStats.labelColor("RAM") == 0xFFE58CFF, "label colour: GAME and RAM");
-        check(FrameStats.labelColor("DRV") == 0xFFB0B0B0 && FrameStats.labelColor("X") == 0xFFB0B0B0, "label colour: DRV and unknown grey");
         check(FrameStats.batteryLevel(30f) == 0 && FrameStats.batteryLevel(42f) == 0 && FrameStats.batteryLevel(Float.NaN) == 0, "bat: normal up to 42");
         check(FrameStats.batteryLevel(42.5f) == 1 && FrameStats.batteryLevel(45f) == 1, "bat: yellow above 42 up to 45");
         check(FrameStats.batteryLevel(45.5f) == 2, "bat: red above 45");
