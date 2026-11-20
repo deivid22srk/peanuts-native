@@ -103,11 +103,11 @@ final class TouchControls extends View {
     TouchControls(Context c, boolean input) {
         super(c);
         this.input = input;
-        cFill = c.getColor(R.color.bn_touch_fill);
-        cLine = c.getColor(R.color.bn_touch_line);
-        cAccent = c.getColor(R.color.bn_touch_accent);
-        cShade = c.getColor(R.color.bn_touch_shade);
-        cDim = c.getColor(R.color.bn_touch_dim);
+        cFill = c.getColor(dev.nxnative.android.R.color.bn_touch_fill);
+        cLine = c.getColor(dev.nxnative.android.R.color.bn_touch_line);
+        cAccent = c.getColor(dev.nxnative.android.R.color.bn_touch_accent);
+        cShade = c.getColor(dev.nxnative.android.R.color.bn_touch_shade);
+        cDim = c.getColor(dev.nxnative.android.R.color.bn_touch_dim);
         opacity = prefs().getFloat("opacity", 0.6f);
         scale = prefs().getFloat("scale", 1f);
         haptics = prefs().getBoolean("haptics", true);
