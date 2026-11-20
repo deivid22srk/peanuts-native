@@ -41,7 +41,7 @@ public final class SelftestActivity extends Activity implements SurfaceHolder.Ca
         status = new TextView(this);
         status.setTextColor(Color.WHITE);
         status.setShadowLayer(4, 0, 0, Color.BLACK);
-        status.setTextSize(20);
+        status.setTextSize(Tokens.TYPE_TITLE);   // the screen's one big line (its title and its verdict): the title tier, as GameActivity's paused screen
         status.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
         status.setPadding(24, 48, 24, 24);
         root.addView(status);

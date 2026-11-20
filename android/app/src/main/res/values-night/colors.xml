@@ -19,6 +19,6 @@
     <color name="bn_warn_tint">#FF3F3014</color>     <!-- warning container, warning chips (text on it 11.4:1) -->
     <color name="bn_ok">#FF7FC79A</color>            <!-- success text: shares the leaf green (8.4:1 on card, 6.8:1 on ok_tint) -->
     <color name="bn_warn">#FFFFC85C</color>          <!-- warning text (10.9:1 on card, 8.3:1 on warn_tint) -->
-    <color name="bn_ok_tint">#FF1C3325</color>       <!-- success container (text on it 6.8:1); no call site yet, see values/colors.xml -->
+    <color name="bn_ok_tint">#FF1C3325</color>       <!-- success container: the Readiness check's PASS rows (see values/colors.xml; ok text on it 6.8:1) -->
     <color name="bn_control_ripple">#33FFF1D2</color><!-- theme widget highlight/ripple (warm white at 20%) -->
 </resources>

@@ -16,6 +16,8 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import dev.nxnative.android.Tokens;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -73,7 +75,7 @@ public final class ScreensOff {
             TextView t = new TextView(d.getContext());
             t.setText("The build goes on. Tap a screen to bring it back.");
             t.setTextColor(0xFF8A8A8A);
-            t.setTextSize(16);
+            t.setTextSize(Tokens.TYPE_BODY);
             t.setGravity(Gravity.CENTER);
             root.addView(t, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
             new Handler(Looper.getMainLooper()).postDelayed(() -> t.animate().alpha(0f).setDuration(600).withEndAction(() -> t.setVisibility(View.GONE)), 3000);

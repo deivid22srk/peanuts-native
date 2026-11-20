@@ -281,7 +281,7 @@ public final class ModsSection {
         if (row instanceof LinearLayout) {
             TextView bin = new TextView(a);
             bin.setText("🗑");
-            bin.setTextSize(17);
+            bin.setTextSize(dev.nxnative.android.Tokens.TYPE_BODY);   // the body stop, by token (this package reaches upstream classes by name, as AppStorage above)
             bin.setGravity(Gravity.CENTER);
             bin.setContentDescription("Delete " + m.name);
             bin.setFocusable(true);

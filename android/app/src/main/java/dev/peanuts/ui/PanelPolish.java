@@ -26,8 +26,14 @@ public final class PanelPolish {
     private PanelPolish() {}
 
     private static final String DONE = "pn_polish";
+    // The panel's own colours, named like SidePanel names FOCUS: the panel is the in-game overlay and keeps its dark look (SidePanel's tabs, headings and notes use
+    // the same greys) — the banana palette is the launcher's, and bn_text/bn_card would disagree with the panel around these pills. Focus is the panel's own
+    // frame: SidePanel.focusMoved draws SidePanel.FOCUS on the focused view's foreground (any view inside the sheet, these pills included), so the pills'
+    // StateListDrawable deliberately carries no focused state — one indicator, the same convention as Ui.style's views being skipped by PadFocus.watch
     private static final int ACCENT = 0xFFFFD54F;   // SidePanel.FOCUS, the selected tab's colour
     private static final int OUTLINE = 0xFF555555;
+    private static final int ON_PILL = 0xFF000000;  // the dark label on the selected pill (dark text on the panel's yellow, as on SidePanel's selected tab)
+    private static final int OFF_PILL = 0xFFE8EAED; // the panel's own label grey (SidePanel's unselected tab label)
 
     public static void apply(View root) {
         if (root == null) return;
@@ -61,7 +67,7 @@ public final class PanelPolish {
             b.setGravity(Gravity.CENTER);
             b.setSingleLine(true);
             b.setPadding(Math.round(6 * dp), 0, Math.round(6 * dp), 0);
-            b.setTextColor(new ColorStateList(new int[][] {{android.R.attr.state_checked}, {}}, new int[] {0xFF000000, 0xFFE8EAED}));
+            b.setTextColor(new ColorStateList(new int[][] {{android.R.attr.state_checked}, {}}, new int[] {ON_PILL, OFF_PILL}));   // no focused state here: SidePanel.focusMoved's yellow frame already marks the focused pill (see the constants above)
             StateListDrawable bg = new StateListDrawable();
             bg.addState(new int[] {android.R.attr.state_checked}, pill(ACCENT, 0, dp));
             bg.addState(new int[] {}, pill(Color.TRANSPARENT, OUTLINE, dp));

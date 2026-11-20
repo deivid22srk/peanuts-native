@@ -649,7 +649,7 @@ final class Ui {
             LinearLayout.LayoutParams vp = fill();
             vp.topMargin = dp(c, Tokens.HAIRLINE_DP);
             col.addView(value, vp);
-            status = text(c, "", Tokens.TYPE_CAPTION, R.color.bn_danger, 600);
+            status = text(c, "", Tokens.TYPE_CAPTION, R.color.bn_warn, 600);   // the row's status line is a warning by default ("Needs Prepare again"): the warning colour — the danger red said every status as a failure, and most are not. A real failure passes true to status(…)
             status.setMaxLines(2);
             status.setVisibility(View.GONE);   // shown by status(…)
             LinearLayout.LayoutParams sp = fill();
@@ -702,8 +702,14 @@ final class Ui {
         }
 
         Setting value(CharSequence s) { value.setText(s); value.setVisibility(s == null || s.length() == 0 ? View.GONE : View.VISIBLE); return this; }
-        /** What the setting needs before it works, in a short line of its own under the value (null: none), so the value still says what the setting does */
-        Setting status(CharSequence s) { status.setText(s); status.setVisibility(s == null || s.length() == 0 ? View.GONE : View.VISIBLE); return this; }
+        /** What the setting needs before it works, in a short line of its own under the value (null: none), so the value still says what the setting does. The line is a warning (bn_warn); error turns it into the danger red for a real failure (the dump's piece cannot be read), not for an action the player can take */
+        Setting status(CharSequence s) { return status(s, false); }
+        Setting status(CharSequence s, boolean error) {
+            status.setText(s);
+            status.setTextColor(col(view.getContext(), error ? R.color.bn_danger : R.color.bn_warn));
+            status.setVisibility(s == null || s.length() == 0 ? View.GONE : View.VISIBLE);
+            return this;
+        }
         /** The tag on the tags' line (null: none); warn picks the warning tint (Ui.tag) */
         Setting tag(Context c, CharSequence s, boolean warn) {
             if (s == null || s.length() == 0) { tag.setVisibility(View.GONE); line(); return this; }

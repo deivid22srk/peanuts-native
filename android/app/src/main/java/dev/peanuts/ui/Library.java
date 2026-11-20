@@ -974,10 +974,11 @@ public final class Library {
         row.addView(c, lp);
     }
 
-    /** The covers' focus ring on a filter-row button, at its edge; a filled button's fill steps inside it */
+    /** The covers' focus ring on a filter-row button, at its edge; a filled button's fill steps inside it. The ring is bn_accent, like Ui.touchable's edge: the
+     *  banana it had reads 1.4:1 on the cream background (WCAG 1.4.11/2.4.7), where the deep gold reads on both modes */
     private void focusRing(View v, int fill) {
         int r = PUi.dp(a, 14), w = PUi.dp(a, 3), gap = PUi.dp(a, 2);
-        LayerDrawable focused = new LayerDrawable(new Drawable[] {PUi.round(Color.TRANSPARENT, r, PUi.col(a, R.color.bn_banana), w),
+        LayerDrawable focused = new LayerDrawable(new Drawable[] {PUi.round(Color.TRANSPARENT, r, PUi.col(a, R.color.bn_accent), w),
                 PUi.round(fill, r - w - gap, 0, 0)});
         focused.setLayerInset(1, w + gap, w + gap, w + gap, w + gap);   // layer insets, not an InsetDrawable: those would become the button's padding
         StateListDrawable s = new StateListDrawable();
@@ -1078,11 +1079,12 @@ public final class Library {
         cover.setClickable(true);
         cover.setFocusable(true);
         cover.setContentDescription(name + ", " + state + (companion ? ", companion installed" : ""));
-        // the ripple under the cover (masked to its 16 dp corners) and the focus ring, 3 dp outside the cover's edge
+        // the ripple under the cover (masked to its 16 dp corners) and the focus ring, 3 dp outside the cover's edge (bn_accent: 5.1:1 on the cream background,
+        // where the banana read 1.4:1; Ui.touchable and PadFocus.frame use the same colour)
         StateListDrawable ring = new StateListDrawable();
-        ring.addState(new int[] {android.R.attr.state_focused}, PUi.round(Color.TRANSPARENT, PUi.dp(a, 20), PUi.col(a, R.color.bn_banana), PUi.dp(a, 3)));
+        ring.addState(new int[] {android.R.attr.state_focused}, PUi.round(Color.TRANSPARENT, PUi.dp(a, 20), PUi.col(a, R.color.bn_accent), PUi.dp(a, 3)));
         ring.addState(new int[0], new ColorDrawable(Color.TRANSPARENT));
-        RippleDrawable ripple = new RippleDrawable(ColorStateList.valueOf(0x336B4423), null, new InsetDrawable(PUi.round(Color.BLACK, PUi.dp(a, 16), 0, 0), p4));
+        RippleDrawable ripple = new RippleDrawable(a.getColorStateList(R.color.bn_control_ripple), null, new InsetDrawable(PUi.round(Color.BLACK, PUi.dp(a, 16), 0, 0), p4));   // the theme widget highlight (the colour PUi.ripple resolves); the content stays transparent and the mask keeps its 4 dp inset, so the helper itself would change the cover's look
         cover.setForeground(new LayerDrawable(new Drawable[] {ripple, ring}));
 
         int coverDp = cellDp - 8;   // the cell less the 4 dp the focus ring needs on each side: the cover stays square

@@ -232,8 +232,12 @@ public final class ReadinessActivity extends Activity {
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(Ui.dp(this, 10), Ui.dp(this, 12), Ui.dp(this, 12), Ui.dp(this, 12));
-        box.setBackground(Ui.ripple(this, Ui.round(bad ? Ui.col(this, x.status == Readiness.Status.FAIL ? R.color.bn_danger_tint : R.color.bn_warn_tint) : android.graphics.Color.TRANSPARENT,
-                Ui.dp(this, 16), 0, 0)));
+        // the row's fill: the failure's red tint, the warning's amber tint, the pass's green tint (bn_ok_tint's first call site — the pass row reads as one state
+        // with the others), and nothing for an info row
+        int fill = x.status == Readiness.Status.FAIL ? Ui.col(this, R.color.bn_danger_tint)
+                : x.status == Readiness.Status.WARNING ? Ui.col(this, R.color.bn_warn_tint)
+                : x.status == Readiness.Status.PASS ? Ui.col(this, R.color.bn_ok_tint) : android.graphics.Color.TRANSPARENT;
+        box.setBackground(Ui.ripple(this, Ui.round(fill, Ui.dp(this, 16), 0, 0)));
         LinearLayout top = Ui.row(this);
         String m = x.status == Readiness.Status.PASS ? "✓" : x.status == Readiness.Status.WARNING ? "!" : x.status == Readiness.Status.FAIL ? "✕" : "i";
         TextView st = Ui.text(this, m, 15, x.status == Readiness.Status.FAIL ? R.color.bn_danger : x.status == Readiness.Status.PASS ? R.color.bn_ok : R.color.bn_text_2, 900);

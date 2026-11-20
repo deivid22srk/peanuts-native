@@ -46,7 +46,7 @@ final class GitHubTextStyle {
         t.setFocusable(true);
         int r = PUi.dp(c, 14), w = PUi.dp(c, 3), p = PUi.dp(c, 10);
         StateListDrawable ring = new StateListDrawable();
-        ring.addState(new int[] {android.R.attr.state_focused}, PUi.round(Color.TRANSPARENT, r, PUi.col(c, R.color.bn_banana), w));
+        ring.addState(new int[] {android.R.attr.state_focused}, PUi.round(Color.TRANSPARENT, r, PUi.col(c, R.color.bn_accent), w));   // bn_accent, like Ui.touchable's edge: the banana read 1.4:1 on the cream (WCAG 1.4.11/2.4.7)
         t.setBackground(ring);
         t.setPadding(p, p, p, p);
         return t;

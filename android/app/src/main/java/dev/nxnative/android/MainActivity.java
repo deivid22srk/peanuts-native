@@ -305,7 +305,7 @@ public final class MainActivity extends Activity {
 
     private View accessCard() {
         LinearLayout c = Ui.card(this);
-        c.setBackground(Ui.round(Ui.col(this, R.color.bn_warn_tint), dp(20), Ui.col(this, R.color.bn_banana_deep), dp(1)));
+        c.setBackground(Ui.round(Ui.col(this, R.color.bn_warn_tint), dp(20), Ui.col(this, R.color.bn_warn), dp(1)));   // the edge in bn_warn (5.3:1 on the warning tint): bn_banana_deep read 1.5:1 — invisible, and this card asks for a permission
         c.addView(Ui.heading(this, "Allow file access"));
         Ui.add(c, Ui.body(this, "Needed to read a dump folder where it is. A .nup file works without it, and a dump folder can be copied into the app instead."), 4);
         Ui.add(c, Ui.button(this, "Allow", Ui.Kind.PRIMARY, v -> openAccessSettings()), 14, Ui.wrap());
@@ -631,7 +631,9 @@ public final class MainActivity extends Activity {
         LinearLayout empty = Ui.emptyState(this, "Add your game",
                 "Pick your dump folder, the one with base/ (and updates/), or your game's .nup or .nsp file.",
                 Ui.action(this, R.drawable.ic_add, "Add game", Ui.Kind.PRIMARY, v -> addGame()));
-        empty.addView(steps, 3, Ui.wrap());   // the steps between the body and the action (Ui.emptyState: icon, heading, body, action)
+        LinearLayout.LayoutParams stepsGap = Ui.wrap();
+        stepsGap.topMargin = dp(Tokens.SPACE_4);   // a raw insert brings no gap (Ui.emptyState's add(…) gives its own children one): keep the body clear of the chips
+        empty.addView(steps, 3, stepsGap);   // the steps between the body and the action (Ui.emptyState: icon, heading, body, action)
         return empty;
     }
 
@@ -897,7 +899,7 @@ public final class MainActivity extends Activity {
                 for (DumpLayout.Item it : items) {
                     String emoji = it.kind.equals("base") ? "🎮" : it.kind.equals("update") ? "⬆️" : it.kind.equals("dlc") ? "🧩" : "⚠️";
                     Ui.Setting s = new Ui.Setting(this, emoji, it.title, null).value(it.detail);
-                    if (it.kind.equals("problem")) s.status(it.title);
+                    if (it.kind.equals("problem")) s.status(it.title, true);   // "Cannot be read" (DumpLayout): a real failure, in the danger red — the other statuses are warnings the player can act on (Ui.Setting.status)
                     s.view.setClickable(false);
                     s.view.setFocusable(false);
                     files.addView(s.view);

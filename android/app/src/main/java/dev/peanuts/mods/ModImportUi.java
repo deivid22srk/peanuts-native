@@ -198,7 +198,7 @@ public final class ModImportUi {
     private static android.widget.TextView textBody(Activity a, String s) {
         android.widget.TextView t = new android.widget.TextView(a);
         t.setText(s);
-        t.setTextSize(15);
+        t.setTextSize(dev.nxnative.android.Tokens.TYPE_BODY);   // the type scale's body stop, by token
         return t;
     }
 
@@ -210,7 +210,7 @@ public final class ModImportUi {
         r.setOnClickListener(l);
         android.widget.TextView t = new android.widget.TextView(a);
         t.setText(emoji + "  " + label);
-        t.setTextSize(16);
+        t.setTextSize(dev.nxnative.android.Tokens.TYPE_BODY);   // the body stop; this package skips PUi but not its tokens (dev.nxnative.android.Tokens, like the R it imports)
         r.addView(t);
         return r;
     }
